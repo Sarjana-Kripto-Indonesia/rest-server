@@ -1,0 +1,4 @@
+Used Models:
+    - courses
+User Modules: 
+    - Courses

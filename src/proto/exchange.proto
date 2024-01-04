@@ -1,0 +1,88 @@
+syntax = "proto3";
+
+message SymbolsRequest {
+    string exchange = 1;
+    int64 minimum_volume = 2;
+}
+
+message SymbolsResponse {
+    string exchange = 1;
+    repeated string symbols = 2;
+}
+
+message SaveAPIKeysRequest {
+    string exchange = 1;
+    string user_id = 2;
+    string api_key = 3;
+    string secret_key = 4;
+    string passphrase = 5;
+}
+
+message SaveAPIKeysResponse {
+    string exchange = 1;
+    string user_id = 2;
+    bool ip_restrict = 3;
+}
+
+message UpdateAPIKeysRequest {
+    string id = 1;
+    string user_id = 2;
+    string api_key = 3;
+    string secret_key = 4;
+    string passphrase = 5; 
+}
+
+message DeleteAPIKeysRequest {
+    string id = 1;
+    string user_id = 2;
+}
+
+message DeleteAPIKeysResponse {
+    string exchange = 1;
+    string user_id = 2;
+    int64 automated_setups_deleted = 3;
+    int64 advanced_setups_deleted = 4;
+    int64 bots_deleted = 5;
+}
+
+message GetBalancesRequest {
+    string exchange = 1;
+    string user_id = 2;
+}
+
+message GetBalancesResponse {
+    double free_usdt = 1;
+    double equivalent_usdt = 2;
+}
+
+message GetExchangesRequest {
+    string user_id = 1;
+}
+
+message Exchange {
+    string id = 1;
+    string exchange = 2;
+    string title = 3;
+    int64 created_at = 4;
+    int64 updated_at = 5;
+    string market = 6;
+}
+
+message GetExchangesResponse {
+    repeated Exchange exchanges = 1;
+}
+
+service ExchangeService {
+    rpc Symbols(SymbolsRequest) returns (SymbolsResponse) {}
+    rpc FuturesSymbols(SymbolsRequest) returns (SymbolsResponse) {}
+    rpc SaveAPIKeys(SaveAPIKeysRequest) returns (SaveAPIKeysResponse) {}
+    rpc UpdateAPIKeys(UpdateAPIKeysRequest) returns (SaveAPIKeysResponse) {}
+    rpc GetBalances(GetBalancesRequest) returns (GetBalancesResponse) {}
+    rpc GetExchanges(GetExchangesRequest) returns (GetExchangesResponse) {}
+    rpc DeleteAPIKeys(DeleteAPIKeysRequest) returns (DeleteAPIKeysResponse) {}
+    rpc FuturesSaveAPIKeys(SaveAPIKeysRequest) returns (SaveAPIKeysResponse) {}
+    rpc FuturesUpdateAPIKeys(UpdateAPIKeysRequest) returns (SaveAPIKeysResponse) {}
+    rpc FuturesGetBalances(GetBalancesRequest) returns (GetBalancesResponse) {}
+    rpc FuturesGetExchanges(GetExchangesRequest) returns (GetExchangesResponse) {}
+    rpc FuturesDeleteAPIKeys(DeleteAPIKeysRequest) returns (DeleteAPIKeysResponse) {}
+}

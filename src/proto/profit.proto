@@ -1,0 +1,181 @@
+syntax = "proto3";
+
+message DailyProfitRequest {
+    string user_id = 1;
+    string timezone = 2;
+    repeated string dates = 3;
+    string bot_type = 4;
+    string exchange = 5;
+    string market = 6;
+    int32 page = 7;
+    int32 limit = 8;
+    string sort_by = 9;
+    string sort_order = 10;
+}
+
+message ProfitChartRequest {
+    string user_id = 1;
+    string timezone = 2;
+    int64 start_date = 3; // miliseconds
+    int64 end_date = 4; // miliseconds
+    string style = 5; // "monthly", "daily"
+    string exchange = 6;
+    string market = 7;
+}
+
+message ProfitChartResponse {
+    repeated string categories = 1;
+    repeated double series = 2;
+}
+
+message DailyProfit {
+    int64 date = 1; // timestamp miliseconds
+    int32 day = 2;
+    int32 month = 3;
+    int32 year = 4;
+    double profit = 5;
+    int32 total = 6;
+    repeated TradeData data = 7;
+}
+
+message TodayProfitRequest {
+    string user_id = 1;
+    string exchange = 2;
+    string market = 3;
+    int64 start_date = 4;
+    int64 end_date = 5;
+}
+
+message DailyDealsRequest {
+    string user_id = 1;
+    string exchange = 2;
+    string market = 3;
+    int64 start_date = 4;
+    int64 end_date = 5;
+}
+
+message TodayProfitResponse {
+    double profit = 1;
+}
+
+message DailyDealsResponse {
+    int64 deals = 1;
+}
+
+message TradeData {
+    string id = 1;
+    string date = 2; // isoformat
+    int32 day = 3;
+    int32 month = 4;
+    int32 year = 5;
+    string symbol = 6;
+    string side = 7;
+    double average_fill_price = 8;
+    double amount_coin_filled = 9;
+    double amount_usd_filled = 10;
+    double pnl = 11;
+    string reason = 12;
+    int32 step = 13;
+    string bot_type = 14;
+}
+
+message FullTradeData {
+    string id = 1;
+    string symbol = 2;
+    string side = 3;
+    string user_id = 4;
+    string bot_id = 5;
+    int64 created_at = 6;
+    bool close_position = 7;
+    string reason = 8;
+    int64 step = 9;
+    string exchange = 10;
+    string session = 11;
+    double price = 12;
+    double amount_coin = 13;
+    double amount_usd = 14;
+    double amount_coin_filled = 15;
+    double amount_usd_filled = 16;
+    double average_fill_price = 17;
+    string order_id = 18;
+    string exchange_order_id = 19;
+    int64 requested_at = 20;
+    int64 executed_at = 21;
+    int64 execution_duration_ms = 22;
+    string bot_name = 24;
+    string bot_type = 25;
+    double pnl = 26;
+    string pnl_percentage = 27;
+    string setup_id = 28;
+}
+
+message FuturesTradeData {
+    string id = 1;
+    string symbol = 2;
+    string side = 3;
+    string user_id = 4;
+    string bot_id = 5;
+    int64 created_at = 6;
+    bool close_position = 7;
+    string reason = 8;
+    int64 step = 9;
+    string exchange = 10;
+    string session = 11;
+    double requested_price = 12;
+    double requested_qty = 13;
+    double requested_usdt = 14;
+    double filled_qty = 15;
+    double filled_usdt = 16;
+    double average_fill_price = 17;
+    string order_id = 18;
+    string exchange_order_id = 19;
+    int64 requested_at = 20;
+    int64 executed_at = 21;
+    int64 updated_at = 22;
+    string bot_name = 24;
+    string bot_type = 25;
+    double pnl = 26;
+    string pnl_percentage = 27;
+    string setup_id = 28;
+    string order_type = 29;
+    string margin_type = 30;
+}
+
+message DailyProfitResponse {
+    string user_id = 1;
+    string timezone = 2;
+    int32 count = 3;
+    repeated DailyProfit records = 4;
+}
+
+message GetTradingHistoryByFiltersRequest {
+    string user_id = 1;
+    string setup_id = 2;
+    string exchange = 3;
+    string bot_type = 4;
+    string symbol = 5;
+    int64 page = 6;
+    int64 limit = 7;
+    repeated string dates = 8;
+    string timezone = 9;
+    string name = 10;
+}
+
+message GetTradingHistoryByFiltersResponse {
+    repeated FullTradeData trades = 1;
+    int64 count = 2;
+}
+
+message FuturesTrades {
+    repeated FuturesTradeData trades = 1;
+    int64 count = 2;
+}
+
+service ProfitService {
+    rpc GetDailyProfits(DailyProfitRequest) returns (DailyProfitResponse) {}
+    rpc GetProfitChart(ProfitChartRequest) returns (ProfitChartResponse) {}
+    rpc GetTodayProfit(TodayProfitRequest) returns (TodayProfitResponse) {}
+    rpc GetDailyDeals(DailyDealsRequest) returns (DailyDealsResponse) {}
+    rpc GetTradingHistoryByFilters(GetTradingHistoryByFiltersRequest) returns (GetTradingHistoryByFiltersResponse) {}
+    rpc GetFuturesTradingHistoryByFilters(GetTradingHistoryByFiltersRequest) returns (FuturesTrades) {}
+}

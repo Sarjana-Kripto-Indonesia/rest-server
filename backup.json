@@ -1,0 +1,21 @@
+{
+    "_id": {
+        "$oid": "63d21d8fb1b43189cbdfe439"
+    },
+    "user_id": "6qcnpemu34Q2vU9KOsEO6vfVbYl2",
+    "title": "Bybit",
+    "exchange_name": "Bybit",
+    "api_key": "gAAAAABj1Bca2YrXiNRIvE3kn2VHgTk_cQdjldr7hc3vJlMwRTemqJaLGV7gWYNumiMo-Bl8xhAnjjpBBL_szzfFwKVdcqvzh4pjVv_R2XAsGDTART9fWe8=",
+    "secret_key": "gAAAAABj1BcavkbW79TEfpCLCRJ7In7SRywSakwDxjZVYaBpTpithdUifBvatfAxag27zLfAF5sUMUkTNELa2NHojvQOgfepqJ--pWwK_9dlodnYCN6BxIXowmybFeEIzIAfFpCNKskm",
+    "created_at": {
+        "$date": {
+            "$numberLong": "1674714511193"
+        }
+    },
+    "updated_at": {
+        "$date": {
+            "$numberLong": "1674877967547"
+        }
+    },
+    "__v": 0
+}

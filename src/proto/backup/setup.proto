@@ -1,0 +1,185 @@
+syntax = "proto3";
+
+option go_package = "../proto";
+
+import "google/protobuf/empty.proto";
+import "bot.proto";
+
+message DefaultFormula {
+    string key = 1;
+    string name = 2;
+    repeated DCAGridStep steps = 3;
+    bool active = 4;
+    int64 created_at = 5;
+    int64 updated_at = 6;
+}
+
+message GetDefaultFormulasResponse {
+    repeated DefaultFormula data = 1;
+}
+
+message Indicator {
+    string indicator = 1;
+    string timeperiod = 2;
+}
+
+message UserIdReq {
+    string user_id = 1;
+}
+
+message GetSetupReq {
+    string user_id = 1;
+    string exchange = 2;
+}
+
+message DCAGridStep {
+    int32 step = 1;
+    double drop_rate = 2;
+    double multiplier = 3;
+    double take_profit = 4;
+    string type = 5;
+}
+
+message SetupStrategyStyle {
+    bool active = 1;
+    string key = 2;
+    string name = 3;
+    repeated DCAGridStep steps = 4;
+}
+
+message AutomatedSetupStrategy {
+    int64 max_concurrent_trading_pair = 1;
+    double usdt_per_order = 2;
+    double usdt_to_apply = 3;
+    SetupStrategyStyle style = 4;
+}
+
+message AutomatedSetupAnalysis {
+    string condition = 1;
+    double minimum_trading_volume = 2;
+    repeated Indicator indicators = 3;
+}
+
+message AutomatedSetupRequest {
+    string user_id = 1;
+    string exchange = 2;
+    uint64 max_concurrent = 3;
+    uint64 max_usdt = 4;
+    uint64 usdt_per_order = 5;
+    uint64 min_trading_volume = 6;
+    repeated string token_exceptions = 7;
+    string indicator_condition = 8;
+    repeated Indicator indicators = 9;
+    SetupStrategyStyle style = 10;
+}
+
+message UpdateAutomatedSetupData {
+    uint64 max_concurrent = 3;
+    uint64 max_usdt = 4;
+    uint64 usdt_per_order = 5;
+    uint64 min_trading_volume = 6;
+    repeated string token_exceptions = 7;
+    string indicator_condition = 8;
+    repeated Indicator indicators = 9;
+    SetupStrategyStyle style = 10;
+}
+
+message UpdateAutomatedSetupRequest {
+    string user_id = 1;
+    string setup_id = 2;
+    UpdateAutomatedSetupData update = 3;
+}
+
+message AutomatedSetup {
+    string id = 1;
+    repeated string token_exceptions = 2;
+    string exchange = 3;
+    AutomatedSetupAnalysis analysis = 4;
+    AutomatedSetupStrategy strategy = 5;
+    int64 created_at = 6;
+    int64 updated_at = 7;
+}
+
+message CreateAutomatedSetupResponse {
+    int64 count_bots = 1;
+    AutomatedSetup setup_data = 2;
+}
+
+message GetAutomatedSetupResponse {
+    repeated AutomatedSetup data = 1;
+}
+
+message DeleteSetupRequest {
+    string user_id = 1;
+    string setup_id = 2;
+}
+
+message DeleteSetupResponse {
+    string setup_id = 1;
+    int64 count_bots = 2;
+}
+
+message AdvancedSetupAnalysis {
+    string condition = 1;
+    repeated Indicator indicators = 2;
+}
+
+message AdvancedSetupStrategy {
+    int64 usdt_per_order = 1;
+    string style = 2;
+    repeated DCAGridStep steps = 3;
+}
+
+message AdvancedSetupRequest {
+    string user_id = 1;
+    string exchange = 2;
+    string type = 3;
+    string symbol = 4;
+    AdvancedSetupAnalysis analysis = 5;
+    AdvancedSetupStrategy strategy = 6;
+    string name = 7;
+}
+
+message AdvancedSetup {
+    string id = 1;
+    string user_id = 2;
+    string exchange = 3;
+    string type = 4;
+    string symbol = 5;
+    AdvancedSetupAnalysis analysis = 6;
+    AdvancedSetupStrategy strategy = 7;
+    string name = 8;
+    int64 created_at = 9;
+    int64 updated_at = 10;
+}
+
+message GetAllAdvancedSetupsRequest {
+    string user_id = 1;
+    string exchange = 2;
+    string type = 3;
+}
+
+message GetAllAdvancedSetupsResponse {
+    repeated AdvancedSetup data = 1;
+}
+
+message UpdateAdvancedSetupRequest {
+    string setup_id = 1;
+    string user_id = 2;
+    AdvancedSetupAnalysis analysis = 3;
+    AdvancedSetupStrategy strategy = 4;
+    string name = 5;
+}
+
+service SetupService {
+    rpc GetDefaultFormulas(google.protobuf.Empty) returns (GetDefaultFormulasResponse) {}
+    rpc CreateAutomatedSetup(AutomatedSetupRequest) returns (CreateAutomatedSetupResponse) {}
+    rpc UpdateAutomatedSetup(UpdateAutomatedSetupRequest) returns (AutomatedSetup) {}
+    rpc GetAllAutomatedSetups(UserIdReq) returns (GetAutomatedSetupResponse) {}
+    rpc GetAutomatedSetupByExchange(GetSetupReq) returns (AutomatedSetup) {}
+    rpc DeleteAutomatedSetup(DeleteSetupRequest) returns (DeleteSetupResponse) {}
+    rpc CreateAdvancedSetup(AdvancedSetupRequest) returns (StandardBot) {}
+    rpc GetAllAdvancedSetups(UserIdReq) returns (GetAllAdvancedSetupsResponse) {}
+    rpc UpdateAdvancedSetup(UpdateAdvancedSetupRequest) returns (AdvancedSetup) {}
+    rpc DeleteAdvancedSetup(DeleteSetupRequest) returns (DeleteSetupResponse) {}
+}

@@ -1,0 +1,63 @@
+syntax = "proto3";
+
+message GetUserByTokenRequest {
+    string token = 1;
+}
+
+message UserId {
+    string user_id = 1;
+}
+
+message CanUserTradeResponse {
+    bool can_trade = 1;
+}
+
+message Subscription {
+    int32 id = 1;
+    int64 start = 2;
+    int64 end = 3;
+    bool trial = 4;
+    int64 max_smart_trade_bot = 5;
+    int64 max_exchange = 6;
+    int64 max_dca_bot = 7;
+    int64 max_grid_bot = 8;
+    int64 profit_share = 9;
+    bool automated_bot = 10;
+    int32 referral_discount = 11;
+    int32 referral_rewards = 12;
+}
+
+message Referral {
+    string code = 1;
+    string user_id = 2;
+}
+
+message OTP {
+    string method = 1;
+    string code = 2;
+    string uses = 3;
+    int64 expired_at = 4;
+}
+
+message User {
+    string uid = 1;
+    string display_name = 2;
+    string email = 3;
+    bool email_verified = 4;
+    string photo_url = 5;
+    string wallet_va = 6;
+    int64 created_at = 7;
+    int64 updated_at = 8;
+    bool locked = 9;
+    string timezone = 10;
+    double balance = 11;
+    Subscription subscription = 12;
+    Referral referral = 13;
+    OTP otp = 14;
+}
+
+service UserService {
+    rpc GetUserByToken (GetUserByTokenRequest) returns (User) {}
+    rpc GetUserById (UserId) returns (User) {}
+    rpc CanUserTrade (UserId) returns (CanUserTradeResponse) {}
+}

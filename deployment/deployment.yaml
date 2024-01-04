@@ -1,0 +1,24 @@
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: <DEPLOYMENT_NAME>
+  labels:
+    purpose: rest-server
+spec:
+  replicas: 1
+  selector:
+    matchLabels:
+      app: rest-server
+  template:
+    metadata:
+      labels: 
+        app: rest-server
+    spec:
+      containers:
+      - name: <CONTAINER_NAME>
+        image: <IMAGE_REGISTRY_URL>
+        envFrom:
+        - configMapRef:
+            name: <CONFIG_MAP_NAME>
+        ports:
+        - containerPort: 4000

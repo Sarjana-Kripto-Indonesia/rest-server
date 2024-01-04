@@ -1,0 +1,12 @@
+{
+  "type": "service_account",
+  "project_id": "bitzenius-staging",
+  "private_key_id": "d0b82a9cf82679ae671852f4399f9554dc03b099",
+  "private_key": "-----BEGIN PRIVATE KEY-----\nMIIEvQIBADANBgkqhkiG9w0BAQEFAASCBKcwggSjAgEAAoIBAQCiI8B4zzRcK85s\n6LvJminJUkrlOey4PLk4tBpOttQASiMN8FSEzzvFon2+0lHELLFfOS4zgNBwE6I6\ncdqti/S7ga9wFxqhJX5yhBLFgIXoEj+15NQGE8wVplz8fKQhlJ2XqHhZ0wXoksrf\njDFzZYWLDUtEDxlFlZzuBFRnjKBQCJIoY//CGZ/biiNVPFZvwBbrQYUvPUlRqBdt\nwI54iN9CEdQLklHcwsiNGogmx0vkkUST0NOzuB72K/V2nSV1dAPF9qvD+MFPEsfe\nT7cpmsKwJrrzQBO3IcJW7f/lRGYDkXPJ+sbmRhAUaL/9XB9MVo3B4/8uXUK8Vrer\nOWYdPb3LAgMBAAECggEAOXpEEm+dx6jt2hTc8ThZ5Njr3PveS2eXX58VDl9ooxuk\n9p2CULxoG4UhX4KOYuVXEYMjOjXJblm/ckmHNGt/W/M6vpkqIwM4Ip9oSiRoE99Y\nP4J5mRfuiqQ5pXYH9zGIdklONMWGfC6BhaLcquRL5YHWcy+JDW5evc/CHh0vfX8j\nuai7UFkU6twR1AHv7rmDWndp2BgHaJrogq3p0Z3UqOtTojdjMi86rdA3/BRTXzB5\n9Hduz3IGa6uzfgul8SvAt/F6fIzve7riBXRF2QGcuFnK2K4dTedeAIOwTR75tleT\nqXhsvyohZ6Hb/ttNkdi46aVxWRlMWOZvNCHc2gPH5QKBgQDVhP99X7lDNcZlgA/8\nVqedjk9uMXR+JzuPa9C9HgTcAkQfCAPScxtvL/blvqscO98cWY+PMHPdrQGwzFXV\nYaZvXvWVBOxdRtatxV2XcUzmTp6cZdgKid4XtFVfg+YYNxlmt3VJydx1SZDSpV0d\nmo3xYnpk3BfiSkeAAoHQ6N+WVwKBgQDCZd5FI7kn7XL8g4IXgKzcd/Yf91390ZzJ\ntSmUY+9wmXifeJ9shngmhuh0DUEwTEOq5cXtquBbmkZkfa7U1NDnNVVvVs8f3dRW\nnD7aCbUx6q+G2+U+1Xfakb2PEOYTsRguB6DO3D0rahlNPXhQ7N679dL3jZW9Puq8\n20b8IRrjrQKBgDBvylGTrIBNq6MM6RNySPXZ+bTirS2NEtrXN3QfYjTSosdzVwKf\nsCKJ+/VkSobOIi/ZNVLjR/WKsK59vB761vm+zfEvO7txPXQQKMoZHrvELAEIrXi+\ni85Oz2sqjcEChtWhWo8RptxIgvz2HGiBzh9rGp7UuupPtWaZqv9MRKRjAoGBALbh\nSqdUoh2T3rb7qOkfXn/SQzNzbXMZPRztV36IPXt6heXQfnqETohAJnL2/TrIpGgj\n3X5nYMYMbuie7FjBFP5OSF+EFTrvX5FTUDWjKFkbZaHDQPlJrYVr0h7DUQ95bTvw\nZTH2M32iRMdLauMG08uTybKl+hadGAwvZapQIpHJAoGALBrl9MiPo/nxXnd1lLW8\n5rcN1g4ZAJNJlxdHdOC+fMV+tzYKQlYtgWo6upc13iGVeQHIYK09+AwTX9P8FPAR\neG1GWLXWFOgcZqTTLXsXI20u5w6F84WymlWDpWR+3QkOKkk7M8wnYpafIDmN/+eY\nUCys9w0CdjmwBwp3FVeHRzs=\n-----END PRIVATE KEY-----\n",
+  "client_email": "firebase-adminsdk-ll4hw@bitzenius-staging.iam.gserviceaccount.com",
+  "client_id": "108383996568762801852",
+  "auth_uri": "https://accounts.google.com/o/oauth2/auth",
+  "token_uri": "https://oauth2.googleapis.com/token",
+  "auth_provider_x509_cert_url": "https://www.googleapis.com/oauth2/v1/certs",
+  "client_x509_cert_url": "https://www.googleapis.com/robot/v1/metadata/x509/firebase-adminsdk-ll4hw%40bitzenius-staging.iam.gserviceaccount.com"
+}

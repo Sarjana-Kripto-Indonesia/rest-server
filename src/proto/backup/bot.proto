@@ -1,0 +1,137 @@
+syntax = "proto3";
+
+option go_package = "../proto";
+
+message StandardBotIndicator {
+    string id = 1;
+    string timeperiod  = 2;
+}
+
+message StandardBotAnalysis {
+    string condition = 1;
+    repeated StandardBotIndicator indicators = 2;
+}
+
+message StandardBotAveragingStep {
+    int64 step = 1;
+    string type = 2;
+    double drop_rate = 3;
+    double multiplier = 4;
+    double take_profit = 5;
+}
+
+message StandardBotPosition {
+    int64 executed_at = 1;
+    double price = 2;
+    double amount_usd = 3;
+    double quantity = 4;
+    string side = 5;
+    int64 step = 6;
+    string reason = 7;
+}
+
+message StandardBot {
+    string object_id = 1;
+    string bot_id = 2;
+    bool active = 3;
+    string active_session_id = 4;
+    StandardBotAnalysis analysis = 5;
+    bool averaging = 6;
+    int64 averaging_limit = 7;
+    repeated StandardBotAveragingStep averaging_steps = 8;
+    int64 created_at = 9;
+    int64 current_step = 10;
+    string exchange = 11;
+    double grid_profit = 12;
+    string name = 13;
+    string next_step_drop_rate = 14;
+    string next_step_price = 15;
+    bool paused = 16;
+    repeated StandardBotPosition positions = 17;
+    double realized_profit = 18;
+    string setup_id = 19;
+    string status = 20;
+    string symbol = 21;
+    string take_profit_price = 22;
+    string take_profit_ratio = 24;
+    int64 timeout_until = 25;
+    string type = 26;
+    int64 updated_at = 27;
+    double usdt_per_order = 28;
+    string user_id = 29;
+    double total_amount = 30;
+    double total_quantity = 31;
+    double total_buy = 32;
+}
+
+// ======================================= REQUEST & RESPONSE SCHEMA ======================================= 
+message GetBotsBySetupIdRequest {
+    string setup_id = 1;
+    string user_id = 2;
+}
+
+message BotsResponse {
+    repeated StandardBot bots = 1;
+}
+
+message GetBotsByExchangeRequest {
+    string exchange = 1;
+    string user_id = 2;
+}
+
+message GetBotByIdRequest {
+    string object_id = 1;
+    string user_id = 2;
+}
+
+message GetBotsByFiltersRequest {
+    string user_id = 1;
+    string type = 2;
+    string name = 3;
+    string exchange = 4;
+    string symbol = 5;
+    bool paused = 6;
+}
+
+message ForceSellRequest {
+    string object_id = 1;
+    string user_id = 2;
+}
+
+message ForceSellResponse {
+    bool success = 1;
+    StandardBot bot = 2;
+}
+
+message DeleteBotRequest {
+    string object_id = 1;
+    string user_id = 2;
+    bool update_token_exceptions = 3;
+}
+
+message DeleteBotResponse {
+    bool success = 1;
+}
+
+message PauseOrContinueBotRequest {
+    string object_id = 1;
+    string user_id = 2;
+}
+
+message PauseOrContinueBotResponse {
+    StandardBot bot = 1;
+    bool success = 2;
+}
+// ==========================================================================================================
+
+// ======================================= SERVICE =======================================
+service BotService {
+    rpc GetBotsBySetupId(GetBotsBySetupIdRequest) returns (BotsResponse) {}
+    rpc GetBotsByExchange(GetBotsByExchangeRequest) returns (BotsResponse) {}
+    rpc GetBotsByFilters(GetBotsByFiltersRequest) returns (BotsResponse) {}
+    rpc GetBotById(GetBotByIdRequest) returns (StandardBot) {}
+    rpc ForceSell(ForceSellRequest) returns (ForceSellResponse) {}
+    rpc DeleteBot(DeleteBotRequest) returns (DeleteBotResponse) {}
+    rpc PauseBot(PauseOrContinueBotRequest) returns (PauseOrContinueBotResponse) {}
+    rpc ContinueBot(PauseOrContinueBotRequest) returns (PauseOrContinueBotResponse) {}
+}
