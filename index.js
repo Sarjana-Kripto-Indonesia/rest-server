@@ -132,6 +132,7 @@ app.use('/user/auth', require('./src/modules/user/auth'))
 // Start of Courses
 app.use('/courses', require('./src/modules/courses/course'))
 app.use('/courses/review', require('./src/modules/courses/course-review'))
+app.use('/courses/syllabus', require('./src/modules/courses/course-syllabus'))
 // app.get('/courses', async (req, res) => {
 //   res.status(200).send({ ok: true });
 // })
