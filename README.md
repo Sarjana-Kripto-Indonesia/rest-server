@@ -1,15 +1,12 @@
-# Zoku Launchpad Rest-Server
+# SKI Rest-Server
 
 ## Overview
-Zoku rest-server handles all web3 related requests that also concerns web2 data, be it in the form of storing or fetching. Most of web3 - web2 coordinations are done by listening smart contracts events.
+SKI is a project, we can call it Learning Management System look alike.
 
 ## Tech Stack
 1. Express.js
-2. Moralis.js
-3. Web3.js
-4. Mailgun.js
-5. MongoDB
-6. Deployed to DigitalOcean
+2. MongoDB
+3. Deployed to DigitalOcean (maybe)
 
 ## Docs
 1. 	[POSTMAN](https://documenter.getpostman.com/view/4203557/UyrBhvSK)
@@ -20,8 +17,6 @@ Zoku rest-server handles all web3 related requests that also concerns web2 data,
 3. Set proper env
 
 ## Highlights
-### Features
-1.
 
 ## How to use
 1. [Dev]() TESTNET
