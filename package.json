@@ -30,6 +30,7 @@
     "firebase-admin": "^11.4.0",
     "form-data": "^4.0.0",
     "geoip-lite": "^1.4.7",
+    "jsonwebtoken": "^9.0.2",
     "moment": "^2.29.1",
     "mongoose": "^6.2.2",
     "node-cron": "^3.0.2",
