@@ -1,7 +1,7 @@
 require('dotenv').config()
 
 // Initiate db
-require('./src/models')
+// require('./src/models')
 
 // GLOBAL LIBRARY
 const express = require('express')
@@ -12,14 +12,17 @@ var cron = require('node-cron');
 const xlsx = require('node-xlsx').default;                       // EXCEL READER
 const fernet = require('fernet');                                   //  FERNET
 const useragent = require('express-useragent');                     // USER AGENT
-let secret = new fernet.Secret(process.env.FERNET_SECRET);
-global.token = new fernet.Token({ secret: secret, time: Date.parse(1) })
+// let secret = new fernet.Secret(process.env.FERNET_SECRET);
+// global.token = new fernet.Token({ secret: secret, time: Date.parse(1) })
 const http = require('http');
 const server = http.createServer(app);                             // SOCKET IO
 const axios = require('axios')
 
+// Middleware
+const { decodeSessionTokenMiddleware } = require('./src/modules/auth/decoding');
+
 // GLOBAL NOT LIBRARY
-const DefaultFormula = require('./src/models/formula');
+// const DefaultFormula = require('./src/models/formula');
 
 // INITIATE REDIS
 // const Redis = require("./src/services/redis")
@@ -56,78 +59,14 @@ app.get('/info', (req, res) => {
   res.status(200).send(metadata)
 })
 
-// ADD DEFAULT FORMULA TO DB
-app.post('/upload-formula', async (req, res) => {
-  var obj = xlsx.parse(__dirname + '/formula.xlsx')[0]; // parses a file
-  console.log('PROCESSING EXCEL');
-  let formulaObj = {
-    conservative: {
-      key: 'A',
-      name: 'Conservative',
-      steps: []
-    },
-    moderate: {
-      key: 'B',
-      name: 'Moderate',
-      steps: []
-    },
-    aggresive: {
-      key: 'C',
-      name: 'Aggresive',
-      steps: []
-    },
-    very_aggresive: {
-      key: 'D',
-      name: 'Very Aggresive',
-      steps: []
-    },
-  }
-
-  let currentFormula = null;
-  let indexToSkip = null;
-  for (let i = 0; i < obj.data.length; i++) {
-    if (indexToSkip == i) continue;
-    let row = obj.data[i];
-    if (row.length == 1) {
-      currentFormula = row[0].toString().toLowerCase();
-      indexToSkip = i++;
-      continue;
-    } else {
-      let step = row[0];
-      let dropRate = row[1];
-      let multiplier = row[2];
-      let profit = (parseFloat(row[3]) * 100).toFixed(2);
-      let tempObj = {
-        step: parseInt(step),
-        drop_rate: parseFloat(dropRate),
-        multiplier: parseFloat(multiplier),
-        take_profit: parseFloat(profit),
-        type: step < 5 ? 'DCA' : 'GRID',
-      }
-      formulaObj[currentFormula].steps.push(tempObj)
-    }
-  }
-  try {
-    for (let objKey in formulaObj) {
-      let value = formulaObj[objKey];
-      let res = await DefaultFormula.create({
-        key: value.key,
-        name: value.name,
-        steps: value.steps,
-        active: false
-      })
-    }
-    res.status(200).send({ ok: true });
-  } catch (error) {
-    console.log('ERROR');
-    console.log(error);
-  }
-})
-
-require('./src/services/queue')
+// require('./src/services/queue')
 
 // User authorization
-app.use('/user/auth', require('./src/modules/user/auth'))
+app.use('/user', require('./src/modules/user/new-auth'))
+// app.use('/user/auth', require('./src/modules/user/auth'))
+
+// Middleware to decode the session token
+app.use('/courses', decodeSessionTokenMiddleware);
 
 // Start of Courses
 app.use('/courses', require('./src/modules/courses/course'))
@@ -154,29 +93,12 @@ app.use('/pricing', require('./src/modules/pricing'))
 // app.use('/admin/promo-codes', adminApi, require('./src/modules/admin/promo-codes'));
 app.use('/admin/promo-codes', require('./src/modules/admin/promo-codes'));
 // app.use('/admin/users', adminApi, require('./src/modules/admin/users'));
-app.use('/admin/users', require('./src/modules/admin/users'));
-app.use('/admin/balances', require('./src/modules/admin/balances'));
+// app.use('/admin/users', require('./src/modules/admin/users'));
+// app.use('/admin/balances', require('./src/modules/admin/balances'));
 
 
 // public
 app.use('/public/newsletter', require('./src/modules/public/newsletter'))
-app.use('/public/volume', require('./src/modules/public/volume'))
-app.get('/public/cryptowatch', async (req, res) => {
-  const params = req.query
-
-  axios.get(`https://api.cryptowat.ch/markets/${params.exchange}/${params.from}${params.to}/ohlc`, {
-    params: params.data,
-    headers: {
-      "X-CW-API-Key": process.env.CRYPTOWATCH_API_KEY,
-    }
-  })
-    .then(result => {
-      return res.status(200).send(result.data)
-    }).catch(err => {
-      console.log("!!!! CRYPTOWATCH API ERR: ", err)
-      return res.status(400).send(err)
-    })
-})
 
 const { writeNotification } = require('./src/services/queue')
 app.post('/test-queue', async (req, res) => {
