@@ -62,10 +62,10 @@ const generateTokensMiddleware = (req, res, next) => {
     const { name, email, password } = req.body;
 
     // Create session token with a short expiration time (e.g., 15 minutes)
-    const sessionToken = jwt.sign({ name, email }, secretKey, { expiresIn: '15m' });
+    const sessionToken = jwt.sign({ name, email, ok:true }, secretKey, { expiresIn: '7d' });
   
     // Create refresh token with a longer expiration time (e.g., 7 days)
-    const refreshToken = jwt.sign({ name, email }, secretKey, { expiresIn: '7d' });
+    const refreshToken = jwt.sign({ name, email, ok:true }, secretKey, { expiresIn: '7d' });
   
     // Add tokens to res.locals for further use in the request lifecycle
     res.locals.sessionToken = sessionToken;
