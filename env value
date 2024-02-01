@@ -1,0 +1,3 @@
+SERVER=http://localhost:4000
+DATABASE_URL=mongodb+srv://ski:fhseQpEIxzG8TvW6@dope.bwrhzob.mongodb.net/ski
+REDIS_URL=rediss://default:AVNS_kSPrePgWOMI_6KURkHW@bitzenius-redis-dev-do-user-10694541-0.b.db.ondigitalocean.com:25061
