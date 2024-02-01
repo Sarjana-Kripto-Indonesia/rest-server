@@ -135,10 +135,8 @@ app.post('/login', generateTokensMiddleware, async (req, res) => {
 
 app.get('/profile', decodeSessionTokenMiddleware, async (req, res) => {
 
-  const getCurrentUser = await Users.findOne({ email: req.user.email }).exec();
-  delete getCurrentUser.password
-  delete getCurrentUser.created_at
-  delete getCurrentUser.updated_at
+  let getCurrentUser = await Users.findOne({ email: req.user.email }).select('-password').exec();
+
 
   return res.status(200).json({ ok: true, data:getCurrentUser });
 } )
