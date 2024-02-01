@@ -74,8 +74,7 @@ app.use('/courses', require('./src/modules/courses/course'))
 app.use('/courses/review', require('./src/modules/courses/course-review'))
 app.use('/courses/syllabus', require('./src/modules/courses/course-syllabus'))
 app.use('/courses/module', require('./src/modules/courses/course-module'))
-
-
+app.use('/courses/quiz', require('./src/modules/courses/course-quiz'))
 // app.get('/courses', async (req, res) => {
 //   res.status(200).send({ ok: true });
 // })
