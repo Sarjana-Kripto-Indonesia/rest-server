@@ -63,6 +63,7 @@ app.get('/info', (req, res) => {
 
 // User authorization
 app.use('/user', require('./src/modules/user/new-auth'))
+
 // app.use('/user/auth', require('./src/modules/user/auth'))
 
 // Middleware to decode the session token
@@ -73,6 +74,8 @@ app.use('/courses', require('./src/modules/courses/course'))
 app.use('/courses/review', require('./src/modules/courses/course-review'))
 app.use('/courses/syllabus', require('./src/modules/courses/course-syllabus'))
 app.use('/courses/module', require('./src/modules/courses/course-module'))
+
+
 // app.get('/courses', async (req, res) => {
 //   res.status(200).send({ ok: true });
 // })

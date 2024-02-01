@@ -1,7 +1,7 @@
 {
   "name": "rest-server",
-  "version": "0.2.3",
-  "description": "Rest api BitZenius",
+  "version": "0.0.1",
+  "description": "Rest api SKI",
   "main": "index.js",
   "scripts": {
     "dev": "nodemon index.js",
