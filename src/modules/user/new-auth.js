@@ -9,6 +9,8 @@ const axios = require('axios')
 const moment = require('moment')
 const { sendEmail, sendTelegram } = require('../../services/queue')
 const { generateRandomPassword } = require('../../helpers/password')
+const { decodeSessionTokenMiddleware } = require('../../modules/auth/decoding');
+
 const UtilLogs = require("../../utils/logs");
 
 const writeLoginRecord = (uid, userRecord, ip, geo, userAgent, banned) => {
@@ -130,4 +132,16 @@ app.post('/login', generateTokensMiddleware, async (req, res) => {
         return res.status(401).json({ message: 'Invalid password' });
     }
 });
+
+app.get('/profile', decodeSessionTokenMiddleware, async (req, res) => {
+
+  const getCurrentUser = await Users.findOne({ email: req.user.email }).exec();
+  delete getCurrentUser.password
+  delete getCurrentUser.created_at
+  delete getCurrentUser.updated_at
+
+  return res.status(200).json({ ok: true, data:getCurrentUser });
+} )
+
+
 module.exports = app

@@ -63,10 +63,8 @@ app.get('/info', (req, res) => {
 
 // User authorization
 app.use('/user', require('./src/modules/user/new-auth'))
-app.use('/locals', decodeSessionTokenMiddleware, async (req, res) => {
-  console.log('locals:', res.locals)
-  res.status(200).json({ok:true})
-})
+
+// app.use('/user/auth', require('./src/modules/user/auth'))
 
 // Middleware to decode the session token
 app.use('/courses', decodeSessionTokenMiddleware);

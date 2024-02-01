@@ -9,7 +9,6 @@ const decodeSessionTokenMiddleware = (req, res, next) => {
     try {
       const decoded = jwt.verify(sessionToken, secretKey);
       req.user = decoded;
-      console.log('DECODED!!!', decoded);
       next();
     } catch (error) {
       // Handle token verification error
