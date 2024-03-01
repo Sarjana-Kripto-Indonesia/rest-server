@@ -62,12 +62,12 @@ const secretKey = 'thisIsOurSecret';
 // Middleware to generate and add tokens to res.locals
 const generateTokensMiddleware = (req, res, next) => {
     const { name, email, password } = req.body;
-
+  
     // Create session token with a short expiration time (e.g., 15 minutes)
-    const sessionToken = jwt.sign({ name, email, ok:true }, secretKey, { expiresIn: '7d' });
+    const sessionToken = jwt.sign({ name, email }, secretKey, { expiresIn: '7d' });
   
     // Create refresh token with a longer expiration time (e.g., 7 days)
-    const refreshToken = jwt.sign({ name, email, ok:true }, secretKey, { expiresIn: '7d' });
+    const refreshToken = jwt.sign({ name, email }, secretKey, { expiresIn: '7d' });
   
     // Add tokens to res.locals for further use in the request lifecycle
     res.locals.sessionToken = sessionToken;
@@ -110,7 +110,7 @@ app.post('/signup', [
 // Login endpoint
 app.post('/login', generateTokensMiddleware, async (req, res) => {
     const { email, password } = req.body;
-    
+
     // Get by email first
     const user = await Users.findOne({email:email});
 
@@ -125,8 +125,8 @@ app.post('/login', generateTokensMiddleware, async (req, res) => {
         // Successful login
 
         //   Session token generating
-        const { sessionToken, refreshToken } = res.locals;
-        
+      const { sessionToken, refreshToken } = res.locals;
+
         return res.status(200).json({ message: 'Login successful', data: {sessionToken, refreshToken} });
     } else {
         return res.status(401).json({ message: 'Invalid password' });
@@ -134,7 +134,9 @@ app.post('/login', generateTokensMiddleware, async (req, res) => {
 });
 
 app.get('/profile', decodeSessionTokenMiddleware, async (req, res) => {
-
+  console.log(req.user);
+  console.log('locals', res.locals);
+  
   let getCurrentUser = await Users.findOne({ email: req.user.email }).select('-password').exec();
 
 
