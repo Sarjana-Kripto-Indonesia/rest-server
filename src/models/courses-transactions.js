@@ -2,7 +2,8 @@ const database = require("../config/database");
 const mongoose = require('mongoose')
 
 const coursesTransactions = database.model("courses-transactions", new database.Schema({
-    course_id: {type:mongoose.Types.ObjectId, ref: 'Courses'},
+    course_id: { type: mongoose.Types.ObjectId, ref: 'Courses' },
+    user_id:{type:mongoose.Types.ObjectId, ref:'Users'},
     payment: Object,
     history_payment: Array,
     course: Object,
