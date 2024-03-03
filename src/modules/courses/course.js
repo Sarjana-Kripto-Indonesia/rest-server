@@ -88,6 +88,52 @@ app.get('/', async (req, res) => {
   }
 })
 
+app.get('/detail/:course_id', async (req, res) => {
+  console.log('get all courses: /');
+  try {
+    let aggregate = [];
+    let query = {
+      _id: mongoose.Types.ObjectId(req.params.course_id)
+    };
+
+    aggregate.push({ $match: query });
+
+    // Lookup modules
+    aggregate.push({
+      $lookup: {
+        from: "courses-syllabuses",
+        localField: "_id",
+        foreignField: "course_id",
+        as: "syllabus_detail",
+        pipeline: [
+          {
+            $lookup: {
+              from: "courses-modules",
+              localField: "_id",
+              foreignField: "syllabus_id",
+              as: "modules"
+            }
+          }
+        ]
+      },
+    })
+
+    // access the DB
+    let execute = await Courses.aggregate(aggregate);
+
+    res.status(200).json({
+      success: true,
+      data: execute.length > 0 ? execute[0] : {},
+    })
+  } catch (error) {
+    console.log(error);
+    res.status(400).json({
+      error: true,
+      message: error
+    })
+  }
+})
+
 
 
 module.exports = app
