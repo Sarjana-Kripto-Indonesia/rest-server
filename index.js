@@ -8,6 +8,7 @@ const express = require('express')
 const cors = require('cors')
 const app = express()
 const bodyParser = require('body-parser')
+const midtransClient = require('midtrans-client');              // MIDTRANS
 var cron = require('node-cron');
 const xlsx = require('node-xlsx').default;                       // EXCEL READER
 const fernet = require('fernet');                                   //  FERNET
@@ -17,6 +18,7 @@ const useragent = require('express-useragent');                     // USER AGEN
 const http = require('http');
 const server = http.createServer(app);                             // SOCKET IO
 const axios = require('axios')
+const Webhooks = require("./src/models/webhooks");
 
 // Middleware
 const { decodeSessionTokenMiddleware } = require('./src/modules/auth/decoding');
@@ -43,6 +45,10 @@ app.use(bodyParser.json())
 app.use(bodyParser.raw())
 app.use(cors());
 app.set('trust proxy', true)
+
+// Set your Midtrans credentials
+
+
 
 // GEN INFO
 const port = process.env.PORT || 4000
@@ -79,6 +85,24 @@ app.use('/courses/quiz', require('./src/modules/courses/course-quiz'))
 //   res.status(200).send({ ok: true });
 // })
 // End of Courses
+
+// Start of Transaction
+
+app.use('/transaction', decodeSessionTokenMiddleware, require('./src/modules/transaction/transaction'))
+// End Of Transaction
+
+// WebHook Test
+app.post('/midtrans-webhook', async (req, res) => {
+  const { body } = req;
+
+  console.log('Received Midtrans Webhook:', body);
+
+  await Webhooks.create({
+    data:body
+  })
+  // Process the webhook payload and update your database accordingly
+  res.status(200).send('Webhook received successfully');
+})
 
 
 // END-POINT WITH MIDDLEWARE
