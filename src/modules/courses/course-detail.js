@@ -30,10 +30,8 @@ app.get('/:course_id', async (req, res) => {
     let query = {
       _id: mongoose.Types.ObjectId(req.params.course_id)
     };
-    
-    const user_id = res.locals.user._id ? mongoose.Types.ObjectId(res.locals.user._id) : null;
-      
-      
+
+    const user_id = res?.locals?.user?._id ? mongoose.Types.ObjectId(res.locals.user._id) : null;
 
     aggregate.push({ $match: query });
 
@@ -81,45 +79,53 @@ app.get('/:course_id', async (req, res) => {
     // access the DB
     let execute = await Courses.aggregate(aggregate);
     let selectedCourse = execute.length > 0 ? execute[0] : {}
-      
-      
+
+
     // Check ownership
     if (user_id) {
       let courseOwnership = await coursesOwnerships.findOne({ course_id: mongoose.Types.ObjectId(req.params.course_id), user_id }).exec();
       if (courseOwnership) {
         selectedCourse.is_bought = true;
         //  Check quiz status
-            selectedCourse.syllabus_detail.forEach((syllabus) => {
-                syllabus.modules.forEach((module) => {
-                    module.quiz_done = module.user_answer.length > 0 ? true : false 
-                    if (module.quiz_done) {
-                      module.quiz.forEach((quiz, idx) => {
-                        let currentAnswerIdx = module.user_answer[0].answers[idx].order - 1
-                        quiz.answers[currentAnswerIdx].chosen = true
-                      })
-                    } else {
-                      // Not answered yet don't show is_correct
-                      module.quiz.forEach((quiz, idx) => {
-                        quiz.answers.forEach((currrent) => {
-                          delete currrent.is_correct
-                        })
-                      })
-                    }
+        selectedCourse.syllabus_detail.forEach((syllabus) => {
+          syllabus.modules.forEach((module) => {
+            module.quiz_done = module.user_answer.length > 0 ? true : false
+            if (module.quiz_done) {
+              module.quiz.forEach((quiz, idx) => {
+                let currentAnswerIdx = module.user_answer[0].answers[idx].order - 1
+                quiz.answers[currentAnswerIdx].chosen = true
+              })
+            } else {
+              // Not answered yet don't show is_correct
+              module.quiz.forEach((quiz, idx) => {
+                quiz.answers.forEach((currrent) => {
+                  delete currrent.is_correct
                 })
-            })
-        //  
+              })
+            }
+          })
+        })
+        //
       } else {
         selectedCourse.is_bought = false;
         selectedCourse.syllabus_detail.forEach((syllabus) => {
-            syllabus.modules.forEach((module) => {
-              module.video = module.video.length;
-              module.quiz = module.quiz.length;
-            })
+          syllabus.modules.forEach((module) => {
+            module.video = module.video.length;
+            module.quiz = module.quiz.length;
+          })
         })
       }
+    } else {
+      selectedCourse.is_bought = false;
+      selectedCourse.syllabus_detail.forEach((syllabus) => {
+        syllabus.modules.forEach((module) => {
+          module.video = module.video.length;
+          module.quiz = module.quiz.length;
+        })
+      })
     }
 
-      
+
 
     res.status(200).json({
       success: true,

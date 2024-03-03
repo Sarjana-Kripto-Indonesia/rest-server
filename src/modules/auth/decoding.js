@@ -14,12 +14,12 @@ const determineBypass = (currentPath, method) => {
   }
 
   // /courses/detail
-  if (currentPath.length == 3 && currentPath[1].includes('courses') && currentPath[2].includes('detail')) {
+  if (currentPath.length == 4 && currentPath[1].includes('courses') && currentPath[2].includes('detail')) {
     isBypass = true
   }
 
   // /courses/review
-  if (currentPath.length == 3 && currentPath[1].includes('courses') && currentPath[2].includes('review')) {
+  if ((currentPath.length == 4 || currentPath.length == 3) && currentPath[1].includes('courses') && currentPath[2].includes('review')) {
     isBypass = true
   }
 
