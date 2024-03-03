@@ -108,7 +108,7 @@ app.post('/buy-course', async (req, res) => {
         });
 
         // Check if course exist
-        let getCourse = await Courses.findOne({ _id: course_id })
+        let getCourse = await Courses.findOne({ _id: course_id }).exec();
         if (!getCourse) return res.status(400).json({
             error: true,
             message:"Couldn't find existing course to proceed"

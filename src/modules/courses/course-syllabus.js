@@ -92,7 +92,7 @@ app.get('/', async (req, res) => {
     let courseOwnership = await coursesOwnerships.findOne({ course_id: mongoose.Types.ObjectId(course_id), user_id }).exec();
     for (let index = 0; index < execute[0].data.length; index++) {
       let data = execute[0].data[index];
-      if (courseOwnership && false) {
+      if (courseOwnership) {
         data?.modules?.forEach((module) => {
           module.quiz_done = module.user_answer.length > 0 ? true : false
           if (module.quiz_done) {
