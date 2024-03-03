@@ -18,7 +18,6 @@ const useragent = require('express-useragent');                     // USER AGEN
 const http = require('http');
 const server = http.createServer(app);                             // SOCKET IO
 const axios = require('axios')
-const Webhooks = require("./src/models/webhooks");
 
 // Middleware
 const { decodeSessionTokenMiddleware } = require('./src/modules/auth/decoding');
@@ -93,18 +92,7 @@ app.use('/transaction', decodeSessionTokenMiddleware, require('./src/modules/tra
 // End Of Transaction
 
 // WebHook Test
-app.post('/midtrans-webhook', async (req, res) => {
-  const { body } = req;
-
-  console.log('Received Midtrans Webhook:', body);
-
-  await Webhooks.create({
-    data:body
-  })
-  // Process the webhook payload and update your database accordingly
-  res.status(200).send('Webhook received successfully');
-})
-
+app.use('/webhook', require('./src/modules/webhook/midtrans'))
 
 // END-POINT WITH MIDDLEWARE
 // app.use('/user/subscription', firebaseApi, require('./src/modules/user/subscription'))
