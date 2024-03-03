@@ -4,6 +4,7 @@ const mongoose = require('mongoose')
 const coursesQuizAnswers = require('../../models/courses-quiz-answers')
 const courseModules = require('../../models/courses-modules')
 const coursesTransactions = require('../../models/courses-transactions')
+const coursesOwnerships = require('../../models/courses-ownerships')
 const Webhooks = require("../../models/webhooks");
 
 app.post('/payment', async (req, res) => {

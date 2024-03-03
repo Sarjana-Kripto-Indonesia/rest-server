@@ -4,7 +4,6 @@ const midtransClient = require('midtrans-client');
 const app = express.Router()
 const Courses = require('../../models/courses')
 const coursesTransactions = require('../../models/courses-transactions')
-const coursesOwnerships = require('../../models/courses-ownerships')
 const snap = new midtransClient.Snap({
   isProduction: false,
   serverKey: 'SB-Mid-server-xKyCOvyiM2QR4r-alOgLGrjK',
