@@ -153,7 +153,7 @@ app.post('/buy-course', async (req, res) => {
         })
 
         const transactionDetails = {
-            order_id: `${res.locals.user._id}-${getCourse._id}}`,
+            order_id: `${createPayment._id}}`,
             gross_amount: coursePrice,
         };
 
