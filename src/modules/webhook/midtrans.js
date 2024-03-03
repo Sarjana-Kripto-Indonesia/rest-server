@@ -22,12 +22,23 @@ app.post('/payment', async (req, res) => {
                 history_payment:body
             },
             $set: {
-                bank:body
+                bank: body,
+                "payment.status": body.transaction_status
             }
         }
 
         // Get Transaction
         const getTransaction = await coursesTransactions.findOne(query).exec();
+
+        // Ownership Create When status settlement
+        if (body.transaction_status == 'settlement') {
+            // Create Ownership
+            await coursesOwnerships.create({
+                course_id: getTransaction.course_id,
+                transaction_id: transactionId,
+                user_id:getTransaction.user_id
+            })
+        }
 
         // Update status
         await coursesTransactions.updateOne(query, update);
@@ -35,7 +46,7 @@ app.post('/payment', async (req, res) => {
         res.status(200).json({
             status: true,
         });
-        
+
     } catch (error) {
         console.log(error);
         res.status(500).json({

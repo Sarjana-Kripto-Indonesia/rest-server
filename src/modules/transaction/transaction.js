@@ -128,7 +128,7 @@ app.post('/buy-course', async (req, res) => {
             user_id:res.locals.user._id,
             payment: {
                 price: coursePrice ? coursePrice : 0,
-                status: "success"
+                status: null
             },
             history_payment: [],
             course: getCourse,
@@ -140,13 +140,6 @@ app.post('/buy-course', async (req, res) => {
 
         console.log('createPayment', createPayment)
 
-        // Ownership Create
-        let createOwnership = await coursesOwnerships.create({
-            course_id: course_id,
-            transaction_id: createPayment._id,
-            user_id:res.locals.user._id
-        })
-
         const transactionDetails = {
             order_id: `${createPayment._id}`,
             gross_amount: coursePrice,
@@ -154,12 +147,9 @@ app.post('/buy-course', async (req, res) => {
 
         // const transactionToken = await snap.createTransactionToken({ transaction_details: transactionDetails });
         const transactionToken = await snap.createTransaction({ transaction_details: transactionDetails });
-
-        console.log('createOwnership', createOwnership);
-
         console.log('transactionToken', transactionToken);
 
-         // Log the status of the transaction
+        // Log the status of the transaction
         // const transactionStatus = await snap.transaction.status(transactionToken);
         // console.log('Transaction Status:', transactionStatus);
 
