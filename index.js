@@ -75,9 +75,9 @@ app.use('/user', require('./src/modules/user/new-auth'))
 // Middleware to decode the session token
 
 // Start of Courses
-app.use('/courses', require('./src/modules/courses/course'))
-app.use('/courses', require('./src/modules/courses/course'))
 app.use('/courses', decodeSessionTokenMiddleware);
+app.use('/courses', require('./src/modules/courses/course'))
+app.use('/courses/detail', require('./src/modules/courses/course-detail'))
 app.use('/courses/review', require('./src/modules/courses/course-review'))
 app.use('/courses/syllabus', require('./src/modules/courses/course-syllabus'))
 app.use('/courses/module', require('./src/modules/courses/course-module'))

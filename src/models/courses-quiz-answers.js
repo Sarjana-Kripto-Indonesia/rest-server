@@ -3,6 +3,7 @@ const mongoose = require('mongoose')
 
 const coursesQuizAnswers = database.model("courses-quiz-answers", new database.Schema({
     module_id: {type:mongoose.Types.ObjectId, ref: 'CoursesModules'},
+    user_id:{type:mongoose.Types.ObjectId, ref:'Users'},
     answers: Array,
     total_correct: Number,
     total_wrong: Number,
