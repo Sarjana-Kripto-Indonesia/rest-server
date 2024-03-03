@@ -169,7 +169,8 @@ app.post('/buy-course', async (req, res) => {
         // console.log('Transaction Status:', transactionStatus);
 
         res.status(200).json({
-            success: true
+            success: true,
+            transactionToken
         })
 
     } catch (error) {
