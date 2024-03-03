@@ -102,7 +102,8 @@ app.post('/signup', [
         })
 
         return res.status(200).send({ok:true});
-    }catch(error){
+    } catch (error) {
+        console.log('error', error)
         res.status(400).send(error)
     }
 })
@@ -129,6 +130,7 @@ app.post('/login', generateTokensMiddleware, async (req, res) => {
 
         return res.status(200).json({ message: 'Login successful', data: {sessionToken, refreshToken} });
     } else {
+        console.log('error', error)
         return res.status(401).json({ message: 'Invalid password' });
     }
 });

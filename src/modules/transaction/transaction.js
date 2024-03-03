@@ -79,11 +79,6 @@ app.get('/user-transaction', async (req, res) => {
                 }
             }
         )
-
-        console.log('aggregate0', aggregate[0])
-        console.log('aggregate1', aggregate[1])
-        console.log('aggregate2', aggregate[2])
-        console.log('aggregate3', aggregate[3])
         // access the DB
         let execute = await coursesTransactions.aggregate(aggregate);
         console.log(execute);

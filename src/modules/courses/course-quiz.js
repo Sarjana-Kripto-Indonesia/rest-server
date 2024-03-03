@@ -7,8 +7,12 @@ app.post('/submit', async (req, res) => {
     console.log('submit quiz: /');
     try {
         // payload
+        const user_id = res.locals.user._id ? mongoose.Types.ObjectId(res.locals.user._id) : null;
+        if (!user_id) return res.status(400).json({ error: true, message: "User not found" });
+
         const moduleId = req.body.module_id ? req.body.module_id : null;
         let answers = req.body.answers ? req.body.answers : null;
+
 
         // get course modules
         const getModule = await courseModules.findOne({ _id: moduleId }).exec();
@@ -33,6 +37,7 @@ app.post('/submit', async (req, res) => {
         // post submit along with the grade
         coursesQuizAnswers.create({
             module_id: moduleId,
+            user_id,
             answers,
             total_correct,
             total_wrong
