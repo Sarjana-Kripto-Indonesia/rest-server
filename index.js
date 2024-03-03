@@ -70,13 +70,14 @@ app.get('/info', (req, res) => {
 // User authorization
 app.use('/user', require('./src/modules/user/new-auth'))
 
-// app.use('/user/auth', require('./src/modules/user/auth'))
+// app.use('/user/auth', require('./src/modules/user/auth'))s
 
 // Middleware to decode the session token
-app.use('/courses', decodeSessionTokenMiddleware);
 
 // Start of Courses
 app.use('/courses', require('./src/modules/courses/course'))
+app.use('/courses', require('./src/modules/courses/course'))
+app.use('/courses', decodeSessionTokenMiddleware);
 app.use('/courses/review', require('./src/modules/courses/course-review'))
 app.use('/courses/syllabus', require('./src/modules/courses/course-syllabus'))
 app.use('/courses/module', require('./src/modules/courses/course-module'))
