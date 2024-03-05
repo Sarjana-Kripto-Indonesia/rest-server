@@ -89,7 +89,7 @@ app.get('/:course_id', async (req, res) => {
         //  Check quiz status
         selectedCourse.syllabus_detail.forEach((syllabus) => {
           syllabus.modules.forEach((module) => {
-            module.quiz_done = module.user_answer.length > 0 ? true : false
+            module.quiz_done = (module.user_answer.length > 0 || module.quiz?.length == 0) ? true : false
             if (module.quiz_done) {
               module.quiz.forEach((quiz, idx) => {
                 let currentAnswerIdx = module.user_answer[0].answers[idx].order - 1
@@ -115,6 +115,8 @@ app.get('/:course_id', async (req, res) => {
           })
         })
       }
+
+
     } else {
       selectedCourse.is_bought = false;
       selectedCourse.syllabus_detail.forEach((syllabus) => {
@@ -125,7 +127,18 @@ app.get('/:course_id', async (req, res) => {
       })
     }
 
+    // * Calculate is done (all quiz answered)
+    let isDone = true
+    for (let index = 0; index < selectedCourse.syllabus_detail.length; index++) {
+      const syllabus = selectedCourse.syllabus_detail[index];
+      const any_not_done = syllabus.modules?.some((module) => !module?.quiz_done)
+      if (any_not_done) {
+        isDone = false
+        break
+      }
+    }
 
+    selectedCourse.is_done = isDone
 
     res.status(200).json({
       success: true,
