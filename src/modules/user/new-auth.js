@@ -130,7 +130,6 @@ app.post('/login', generateTokensMiddleware, async (req, res) => {
 
         return res.status(200).json({ message: 'Login successful', data: {sessionToken, refreshToken} });
     } else {
-        console.log('error', error)
         return res.status(401).json({ message: 'Invalid password' });
     }
 });
