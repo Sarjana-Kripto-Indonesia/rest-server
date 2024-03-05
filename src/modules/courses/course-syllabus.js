@@ -90,7 +90,7 @@ app.get('/', async (req, res) => {
 
     // Check ownership
     let courseOwnership = await coursesOwnerships.findOne({ course_id: mongoose.Types.ObjectId(course_id), user_id }).exec();
-    for (let index = 0; index < execute[0].data.length; index++) {
+    for (let index = 0; index < execute[0]?.data?.length || 0; index++) {
       let data = execute[0].data[index];
       if (courseOwnership) {
         data?.modules?.forEach((module) => {

@@ -25,6 +25,9 @@ app.get('/', async (req, res) => {
     const page = req.query.page ? parseInt(req.query.page) : 1
     const limit = req.query.limit ? parseInt(req.query.limit) : 10
     const start = ((page - 1) * (limit));
+    const is_mine = req.query.is_mine ? 1 : 0
+
+
 
 
     // automatically convert from obj to find parameter with regex
@@ -48,6 +51,28 @@ app.get('/', async (req, res) => {
     }
 
     aggregate.push({ $match: query });
+
+    if (is_mine) {
+      aggregate.push(
+        {
+          $lookup: {
+            from: "courses-ownerships",
+            localField: "_id",
+            foreignField: "course_id",
+            as: "ownership"
+          }
+        }
+      )
+      aggregate.push({
+        $match: {
+          $expr: {
+            $gt: [{ $size: "$ownership" }, 0]
+          }
+        }
+      })
+    }
+
+
     // sorting
     if (qSorting && Object.keys(qSorting).length > 0) {
       for (var key in qSorting) {
@@ -80,11 +105,11 @@ app.get('/', async (req, res) => {
 
       aggregate.push({
         $addFields: {
-          is_bought: {$gt:[{$size:"$ownership"}, 0]}
+          is_bought: { $gt: [{ $size: "$ownership" }, 0] }
         }
       })
     }
-    
+
 
     //grouping all match documents
     aggregate.push({
