@@ -76,13 +76,33 @@ app.get('/:course_id', async (req, res) => {
       },
     })
 
+    // Get Completion
+    aggregate.push({
+      $lookup: {
+        from: "courses-ownerships",
+        let: { course_id:"$_id", user_id:ObjectId('65a180c4548bbd723a4f152a') },
+        pipeline: [
+          {
+            $match: {
+              $expr: {
+                $and: [
+                  { $eq: ["$course_id", "$$course_id"] },
+                  { $eq: ["$user_id", "$$user_id"] }
+                ]
+              }
+            }
+          }
+        ],
+        as: "ownership"
+    }})
+
     // access the DB
     let execute = await Courses.aggregate(aggregate);
     let selectedCourse = execute.length > 0 ? execute[0] : {}
 
 
-    // Check ownership
     if (user_id) {
+      // Check ownership
       let courseOwnership = await coursesOwnerships.findOne({ course_id: mongoose.Types.ObjectId(req.params.course_id), user_id }).exec();
       if (courseOwnership) {
         selectedCourse.is_bought = true;
@@ -105,7 +125,10 @@ app.get('/:course_id', async (req, res) => {
             }
           })
         })
-        //
+
+        //Check is_done = all module finished
+        
+
       } else {
         selectedCourse.is_bought = false;
         selectedCourse.syllabus_detail.forEach((syllabus) => {
