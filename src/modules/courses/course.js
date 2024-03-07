@@ -23,7 +23,6 @@ app.get('/', async (req, res) => {
     const qSorting = req.query.sort ? JSON.parse(req.query.sort) : null;
     const page = req.query.page ? parseInt(req.query.page) : 1
     const limit = req.query.limit ? parseInt(req.query.limit) : 10
-    const is_mine = req.query.is_mine ? req.query.is_mine : 0
     
     const start = ((page - 1) * (limit));
     const is_mine = req.query.is_mine ? 1 : 0
