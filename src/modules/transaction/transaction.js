@@ -118,12 +118,6 @@ app.post('/buy-course', async (req, res) => {
         let coursePrice = getCourse.price.value - discountPrice
 
         // Payment Gateway
-
-
-        // Get Price
-
-        console.log('createPayment', createPayment)
-
         const transactionDetails = {
             order_id: `${createPayment._id}`,
             gross_amount: coursePrice,
@@ -157,6 +151,7 @@ app.post('/buy-course', async (req, res) => {
             deletedAt: null
         });
 
+        console.log('createPayment', createPayment)
         res.status(200).json({
             success: true,
             transactionToken
