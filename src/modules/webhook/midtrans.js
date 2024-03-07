@@ -37,7 +37,9 @@ app.post('/payment', async (req, res) => {
             await coursesOwnerships.create({
                 course_id: getTransaction.course_id,
                 transaction_id: transactionId,
-                user_id:getTransaction.user_id
+                user_id: getTransaction.user_id,
+                is_reviewed: false,
+                is_done:false
             })
         }
 

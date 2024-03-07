@@ -2,6 +2,8 @@ const express = require('express')
 const app = express.Router()
 const mongoose = require('mongoose')
 const coursesReviews = require('../../models/courses-reviews')
+const coursesOwnerships = require('../../models/courses-ownerships')
+
 app.post('/', async (req, res) => {
   console.log('create review: /');
   try {
@@ -47,6 +49,16 @@ app.post('/', async (req, res) => {
         })
       }
     });
+
+    // Write is_reviewed on ownership
+    const queryFind = { course_id:mongoose.Types.ObjectId(course), user_id }
+    const queryUpdate = {
+      $set: {
+        is_reviewed:true
+      }
+    }
+    // course
+    const setReview = await coursesOwnerships.updateOne(queryFind, queryUpdate);
 
   } catch (error) {
     console.log(error);
