@@ -77,24 +77,27 @@ app.get('/:course_id', async (req, res) => {
     })
 
     // Get Completion
-    aggregate.push({
-      $lookup: {
-        from: "courses-ownerships",
-        let: { course_id:"$_id", user_id:ObjectId('65a180c4548bbd723a4f152a') },
-        pipeline: [
-          {
-            $match: {
-              $expr: {
-                $and: [
-                  { $eq: ["$course_id", "$$course_id"] },
-                  { $eq: ["$user_id", "$$user_id"] }
-                ]
+    if (user_id) {
+      aggregate.push({
+        $lookup: {
+          from: "courses-ownerships",
+          let: { course_id:"$_id", user_id},
+          pipeline: [
+            {
+              $match: {
+                $expr: {
+                  $and: [
+                    { $eq: ["$course_id", "$$course_id"] },
+                    { $eq: ["$user_id", "$$user_id"] }
+                  ]
+                }
               }
             }
-          }
-        ],
-        as: "ownership"
-    }})
+          ],
+          as: "ownership"
+      }})
+    }
+
 
     // access the DB
     let execute = await Courses.aggregate(aggregate);
