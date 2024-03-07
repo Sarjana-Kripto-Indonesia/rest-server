@@ -24,7 +24,8 @@ app.post('/payment', async (req, res) => {
             },
             $set: {
                 bank: body,
-                "payment.status": body.transaction_status
+                "payment.status": body.transaction_status,
+                "payment.type":body.payment_type
             }
         }
 
@@ -41,6 +42,14 @@ app.post('/payment', async (req, res) => {
                 is_reviewed: false,
                 is_done:false
             })
+
+            // If there's succeded transaction remove the other for the same course
+            await coursesTransactions.deleteMany({
+                $and: [
+                    { course_id: getTransaction.course_id },
+                    { _id: { $ne: transactionId } }
+                ]
+            });
         }
 
         // Update status

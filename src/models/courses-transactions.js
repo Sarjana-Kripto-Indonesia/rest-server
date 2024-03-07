@@ -10,6 +10,7 @@ const coursesTransactions = database.model("courses-transactions", new database.
     type: String,
     content: String,
     bank: Object,
+    token:Object,
     deletedAt:Date
 }, {
     timestamps: {

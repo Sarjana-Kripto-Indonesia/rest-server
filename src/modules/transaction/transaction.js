@@ -102,6 +102,7 @@ app.post('/buy-course', async (req, res) => {
     try {
         // Body
         let course_id = req.body.course_id ? mongoose.Types.ObjectId(req.body.course_id) : null;
+        let callback_url = req.body.callback_url ? req.body.callback_url : null;
         if (!course_id) return res.status(400).json({
             error: true,
             message:"Please provide course ID"
@@ -121,6 +122,24 @@ app.post('/buy-course', async (req, res) => {
 
         // Get Price
 
+        console.log('createPayment', createPayment)
+
+        const transactionDetails = {
+            order_id: `${createPayment._id}`,
+            gross_amount: coursePrice,
+        };
+
+        const callbacks = {
+            "finish": callback_url || "https://dev-web-apps.vercel.app/"
+        }
+
+        const transactionToken = await snap.createTransaction({ transaction_details: transactionDetails, callbacks });
+        console.log('transactionToken', transactionToken);
+
+        // Log the status of the transaction
+        // const transactionStatus = await snap.transaction.status(transactionToken);
+        // console.log('Transaction Status:', transactionStatus);
+
         // Payment Create
         let createPayment = await coursesTransactions.create({
             course_id: course_id,
@@ -132,25 +151,11 @@ app.post('/buy-course', async (req, res) => {
             history_payment: [],
             course: getCourse,
             type: "class",
-            content: "Payment for course XXXX",
+            content: `Payment for course ${getCourse.name}`,
             bank: { type: "BCA", number: 331021312312 },
+            token:transactionToken,
             deletedAt: null
         });
-
-        console.log('createPayment', createPayment)
-
-        const transactionDetails = {
-            order_id: `${createPayment._id}`,
-            gross_amount: coursePrice,
-        };
-
-        // const transactionToken = await snap.createTransactionToken({ transaction_details: transactionDetails });
-        const transactionToken = await snap.createTransaction({ transaction_details: transactionDetails });
-        console.log('transactionToken', transactionToken);
-
-        // Log the status of the transaction
-        // const transactionStatus = await snap.transaction.status(transactionToken);
-        // console.log('Transaction Status:', transactionStatus);
 
         res.status(200).json({
             success: true,
