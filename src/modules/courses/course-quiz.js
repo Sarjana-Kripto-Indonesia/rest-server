@@ -90,9 +90,7 @@ app.post('/submit', async (req, res) => {
         // get answers of quiz
         if (getModules.length > 0 && getModules[0].data.length > 0) { // check quiz existance
             for (let val of getModules[0].data) {
-                console.log('val', val)
                 const getAnswer = await coursesQuizAnswers.findOne({ module_id: mongoose.Types.ObjectId(val.module_id), user_id}).exec();
-                console.log('getAnswer', getAnswer);
                 if (!getAnswer) {
                     isCourseAllDone = false
                 }

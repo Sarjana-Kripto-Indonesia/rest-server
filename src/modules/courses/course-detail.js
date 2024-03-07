@@ -110,30 +110,48 @@ app.get('/:course_id', async (req, res) => {
       if (courseOwnership) {
         selectedCourse.is_bought = true;
         //  Check quiz status
-        selectedCourse.syllabus_detail.forEach((syllabus) => {
-          syllabus.modules.forEach((module) => {
-            module.quiz_done = (module.user_answer.length > 0 || module.quiz?.length == 0) ? true : false
-            if (module.quiz_done) {
-              module.quiz.forEach((quiz, idx) => {
-                let currentAnswerIdx = module.user_answer[0].answers[idx].order - 1
-                quiz.answers[currentAnswerIdx].chosen = true
-              })
-            } else {
-              // Not answered yet don't show is_correct
-              module.quiz.forEach((quiz, idx) => {
-                quiz.answers.forEach((currrent) => {
-                  delete currrent.is_correct
+        if (selectedCourse.syllabus_detail.length > 0) {
+          selectedCourse.syllabus_detail.forEach((syllabus) => {
+            syllabus.modules.forEach((module) => {
+              module.quiz_done = (module.user_answer.length > 0 || module.quiz?.length == 0) ? true : false
+              if (module.quiz_done) {
+                module.quiz.forEach((quiz, idx) => {
+                  let currentAnswerIdx = module.user_answer[0].answers[idx].order - 1
+                  quiz.answers[currentAnswerIdx].chosen = true
                 })
-              })
-            }
+              } else {
+                // Not answered yet don't show is_correct
+                module.quiz.forEach((quiz, idx) => {
+                  quiz.answers.forEach((currrent) => {
+                    delete currrent.is_correct
+                  })
+                })
+              }
+            })
           })
-        })
+        }
+
 
         //Check is_done = all module finished
         
 
       } else {
         selectedCourse.is_bought = false;
+        if (selectedCourse.syllabus_detail && selectedCourse.syllabus_detail.length > 0) {
+          selectedCourse.syllabus_detail.forEach((syllabus) => {
+            syllabus.modules.forEach((module) => {
+              module.video = module.video.length;
+              module.quiz = module.quiz.length;
+            })
+          })
+        }
+
+      }
+
+
+    } else {
+      selectedCourse.is_bought = false;
+      if (selectedCourse.syllabus_detail.length > 0) {
         selectedCourse.syllabus_detail.forEach((syllabus) => {
           syllabus.modules.forEach((module) => {
             module.video = module.video.length;
@@ -141,26 +159,18 @@ app.get('/:course_id', async (req, res) => {
           })
         })
       }
-
-
-    } else {
-      selectedCourse.is_bought = false;
-      selectedCourse.syllabus_detail.forEach((syllabus) => {
-        syllabus.modules.forEach((module) => {
-          module.video = module.video.length;
-          module.quiz = module.quiz.length;
-        })
-      })
     }
 
     // * Calculate is done (all quiz answered)
     let isDone = true
-    for (let index = 0; index < selectedCourse.syllabus_detail.length; index++) {
-      const syllabus = selectedCourse.syllabus_detail[index];
-      const any_not_done = syllabus.modules?.some((module) => !module?.quiz_done)
-      if (any_not_done) {
-        isDone = false
-        break
+    if (selectedCourse.syllabus_detail && selectedCourse.syllabus_detail.length > 0) {
+      for (let index = 0; index < selectedCourse.syllabus_detail.length; index++) {
+        const syllabus = selectedCourse.syllabus_detail[index];
+        const any_not_done = syllabus.modules?.some((module) => !module?.quiz_done)
+        if (any_not_done) {
+          isDone = false
+          break
+        }
       }
     }
 
