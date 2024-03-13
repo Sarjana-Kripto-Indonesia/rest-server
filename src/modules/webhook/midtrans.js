@@ -41,7 +41,7 @@ app.post('/payment', async (req, res) => {
       // Create Ownership
       await coursesOwnerships.create({
         course_id: getTransaction.course_id,
-        transaction_id: transactionId,
+        transaction_id: getTransaction._id,
         user_id: getTransaction.user_id,
         is_reviewed: false,
         is_done: false
@@ -51,7 +51,7 @@ app.post('/payment', async (req, res) => {
       await coursesTransactions.deleteMany({
         $and: [
           { course_id: getTransaction.course_id },
-          { _id: { $ne: transactionId } }
+          { _id: { $ne: getTransaction._id } }
         ]
       });
     }
