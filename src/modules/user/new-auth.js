@@ -12,6 +12,8 @@ const { generateRandomPassword } = require('../../helpers/password')
 const { decodeSessionTokenMiddleware } = require('../../modules/auth/decoding');
 
 const UtilLogs = require("../../utils/logs");
+const { sendVerificationEmail } = require('../../services/mailing');
+const generateToken = require('../../utils/generate-token');
 
 const writeLoginRecord = (uid, userRecord, ip, geo, userAgent, banned) => {
   return new Promise(async (resolve, reject) => {
@@ -43,17 +45,17 @@ const sendLoginEmail = (_id, userRecord, ip, geo, userAgent, banned) => {
       })
       return resolve();
     } catch (error) {
-        console.error(error);
-        return reject(error)
+      console.error(error);
+      return reject(error)
     }
   })
 }
 
-// Hashing a.k.a Encrypt    
+// Hashing a.k.a Encrypt
 const hashString = (val) => {
-    const hash = crypto.createHash('sha256');
-    hash.update(val);
-    return hash.digest('hex')
+  const hash = crypto.createHash('sha256');
+  hash.update(val);
+  return hash.digest('hex')
 }
 
 // Secret for JWT
@@ -61,19 +63,19 @@ const secretKey = 'thisIsOurSecret';
 
 // Middleware to generate and add tokens to res.locals
 const generateTokensMiddleware = (req, res, next) => {
-    const { name, email, password } = req.body;
-  
-    // Create session token with a short expiration time (e.g., 15 minutes)
-    const sessionToken = jwt.sign({ name, email }, secretKey, { expiresIn: '7d' });
-  
-    // Create refresh token with a longer expiration time (e.g., 7 days)
-    const refreshToken = jwt.sign({ name, email }, secretKey, { expiresIn: '7d' });
-  
-    // Add tokens to res.locals for further use in the request lifecycle
-    res.locals.sessionToken = sessionToken;
-    res.locals.refreshToken = refreshToken;
-  
-    next();
+  const { name, email, password } = req.body;
+
+  // Create session token with a short expiration time (e.g., 15 minutes)
+  const sessionToken = jwt.sign({ name, email }, secretKey, { expiresIn: '7d' });
+
+  // Create refresh token with a longer expiration time (e.g., 7 days)
+  const refreshToken = jwt.sign({ name, email }, secretKey, { expiresIn: '7d' });
+
+  // Add tokens to res.locals for further use in the request lifecycle
+  res.locals.sessionToken = sessionToken;
+  res.locals.refreshToken = refreshToken;
+
+  next();
 };
 
 app.post('/signup', [
@@ -87,62 +89,71 @@ app.post('/signup', [
     minSymbols: 1
   })
 ], async (req, res) => {
-    try{
-        const {name, email, password} = req.body
+  try {
+    const { name, email, password } = req.body
 
-        const errors = validationResult(req)
-        if (!errors.isEmpty()) {
-            return res.status(400).json({ errors: errors.array() });
-        }
-
-        let createUser = await Users.create({
-            name,
-            email,
-            password:hashString(password)
-        })
-
-        return res.status(200).send({ok:true});
-    } catch (error) {
-        console.log('error', error)
-        res.status(400).send(error)
+    const errors = validationResult(req)
+    if (!errors.isEmpty()) {
+      return res.status(400).json({ errors: errors.array() });
     }
+
+    let createUser = await Users.create({
+      name,
+      email,
+      is_verified: false,
+      password: hashString(password)
+    })
+
+    // * Send verification email
+    const token = await generateToken(createUser._id, "user-verification")
+    sendVerificationEmail({
+      token,
+      email,
+      name
+    })
+
+    return res.status(200).send({ ok: true });
+  } catch (error) {
+    console.log('error', error)
+    res.status(400).send(error)
+  }
 })
 
 // Login endpoint
 app.post('/login', generateTokensMiddleware, async (req, res) => {
-    const { email, password } = req.body;
+  const { email, password } = req.body;
 
-    // Get by email first
-    const user = await Users.findOne({email:email});
+  // Get by email first
+  const user = await Users.findOne({ email: email });
 
-    if (!user) {
-      return res.status(401).json({ message: "Couldn't find any user with that email" });
-    }
+  if (!user) {
+    return res.status(401).json({ message: "Couldn't find any user with that email" });
+  }
 
-    // Hash the provided password and compare with the stored hash
-    const hashedPassword = hashString(password);
+  // Hash the provided password and compare with the stored hash
+  const hashedPassword = hashString(password);
 
-    if (hashedPassword === user.password) {
-        // Successful login
+  if (hashedPassword === user.password) {
+    // Successful login
 
-        //   Session token generating
-      const { sessionToken, refreshToken } = res.locals;
+    //   Session token generating
+    const { sessionToken, refreshToken } = res.locals;
 
-        return res.status(200).json({ message: 'Login successful', data: {sessionToken, refreshToken} });
-    } else {
-        return res.status(401).json({ message: 'Invalid password' });
-    }
+    return res.status(200).json({ message: 'Login successful', data: { sessionToken, refreshToken } });
+  } else {
+    return res.status(401).json({ message: 'Invalid password' });
+  }
 });
 
 app.get('/profile', decodeSessionTokenMiddleware, async (req, res) => {
   console.log(req.user);
   console.log('locals', res.locals);
-  
+
   let getCurrentUser = await Users.findOne({ email: req.user.email }).select('-password').exec();
 
 
-  return res.status(200).json({ ok: true, data:getCurrentUser });
-} )
+  return res.status(200).json({ ok: true, data: getCurrentUser });
+})
 
 
 module.exports = app

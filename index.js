@@ -66,6 +66,10 @@ app.get('/info', (req, res) => {
 
 // require('./src/services/queue')
 
+// * Experiment
+app.use('/experiment', require('./src/modules/experiment'))
+
+
 // User authorization
 app.use('/user', require('./src/modules/user/new-auth'))
 
@@ -81,6 +85,7 @@ app.use('/courses/review', require('./src/modules/courses/course-review'))
 app.use('/courses/syllabus', require('./src/modules/courses/course-syllabus'))
 app.use('/courses/module', require('./src/modules/courses/course-module'))
 app.use('/courses/quiz', require('./src/modules/courses/course-quiz'))
+app.use('/user-auth', decodeSessionTokenMiddleware, require('./src/modules/user/auth'))
 // app.get('/courses', async (req, res) => {
 //   res.status(200).send({ ok: true });
 // })
