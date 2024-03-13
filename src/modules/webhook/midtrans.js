@@ -21,7 +21,7 @@ app.post('/payment', async (req, res) => {
       throw new Error("Transaction ID not found")
     }
 
-    const query = { _id: transactionId };
+    const query = { order_id: transactionId };
     const update = {
       $push: {
         history_payment: body
