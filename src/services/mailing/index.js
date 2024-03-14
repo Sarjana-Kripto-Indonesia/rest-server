@@ -64,6 +64,30 @@ const sendVerificationEmail = async ({ token, email, name }) => {
   }
 }
 
+/**
+ * Send forgot password email
+ * @param {string} token
+ * @param {string} email
+ * @param {string} name
+ */
+const sendForgotPasswordEmail = async ({ token, email, name }) => {
+  const template_id = 5787504
+  const subject = "Forgot Password"
+
+  try {
+    const link = WEB_URL + "/callback/reset-password?token=" + token
+    const data = {
+      link,
+      name
+    }
+
+    await sendEmail({ data, template_id, subject, email, name })
+  } catch (error) {
+    console.error("SEND EMAIL ERROR", { error })
+  }
+}
+
 module.exports = {
-  sendVerificationEmail
+  sendVerificationEmail,
+  sendForgotPasswordEmail
 }

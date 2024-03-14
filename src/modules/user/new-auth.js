@@ -12,8 +12,9 @@ const { generateRandomPassword } = require('../../helpers/password')
 const { decodeSessionTokenMiddleware } = require('../../modules/auth/decoding');
 
 const UtilLogs = require("../../utils/logs");
-const { sendVerificationEmail } = require('../../services/mailing');
+const { sendVerificationEmail, sendForgotPasswordEmail } = require('../../services/mailing');
 const generateToken = require('../../utils/generate-token');
+const UserToken = require('../../models/user-token');
 
 const writeLoginRecord = (uid, userRecord, ip, geo, userAgent, banned) => {
   return new Promise(async (resolve, reject) => {
@@ -143,6 +144,74 @@ app.post('/login', generateTokensMiddleware, async (req, res) => {
   } else {
     return res.status(401).json({ message: 'Invalid password' });
   }
+});
+
+// Forget password endpoint
+app.post('/forgot-password', async (req, res) => {
+  try {
+    const { email } = req.body;
+
+    // Get by email first
+    const user = await Users.findOne({ email: email });
+
+    if (!user) {
+      return res.status(401).json({ message: "Couldn't find any user with that email" });
+    }
+
+    // * Send forgot password email
+    const token = await generateToken(user._id, "forgot-password", 60 * 60 * 24)
+    await sendForgotPasswordEmail({
+      token,
+      email: user.email,
+      name: user.name
+    })
+
+    return res.status(200).json({ message: 'Email sent!' });
+  } catch (error) {
+    console.log({ error })
+    return res.status(500).json({ message: 'Server error' });
+  }
+
+});
+
+app.post('/reset-password', async (req, res) => {
+  try {
+    const { password, token } = req.body;
+
+    // * Get by email first
+    const check_token = await UserToken.findOne({
+      token,
+      expires_at: {
+        $gte: moment().toISOString()
+      }
+    })
+
+    if (!check_token) return res.status(400).json({
+      error: true,
+      message: "Token unavailable or expired"
+    })
+
+    // * Reset password for user
+    const updated_user = await Users.updateOne({
+      _id: check_token.user_id
+    }, {
+      $set: {
+        password: hashString(password)
+      }
+    })
+
+    // * Delete all token from that user
+    await UserToken.remove({
+      user_id: check_token.user_id,
+      type: "forgot-password"
+    })
+
+    return res.status(200).json({ message: 'Password updated!', data: updated_user });
+  } catch (error) {
+    console.log({ error })
+    return res.status(500).json({ message: 'Server error' });
+  }
+
 });
 
 app.get('/profile', decodeSessionTokenMiddleware, async (req, res) => {

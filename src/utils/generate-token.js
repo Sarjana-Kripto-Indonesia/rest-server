@@ -2,10 +2,10 @@ const { randomBytes } = require("crypto");
 const moment = require("moment")
 const UserToken = require("../models/user-token");
 
-async function generateToken(user_id, type = 'user-verification') {
+async function generateToken(user_id, type = 'user-verification', lifetime_in_seconds = 3600) {
   const buffer = randomBytes(48)
   const token = buffer.toString('hex');
-  const expires_at = moment().add(3600, 'seconds').toISOString()
+  const expires_at = moment().add(lifetime_in_seconds, 'seconds').toISOString()
 
 
   await UserToken.create({
