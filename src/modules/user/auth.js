@@ -5,7 +5,7 @@ const UserToken = require('../../models/user-token');
 const mongoose = require('mongoose');
 const moment = require('moment/moment');
 const generateToken = require('../../utils/generate-token');
-const { sendVerificationEmail } = require('../../services/mailing');
+const { sendVerificationEmail, sendWelcomeEmail } = require('../../services/mailing');
 
 app.post('/verification', async (req, res) => {
   try {
@@ -28,6 +28,11 @@ app.post('/verification', async (req, res) => {
 
     // * Flag user as verified
     let updated_user = await Users.updateOne({ _id: user_id }, { $set: { is_verified: true } })
+
+    const user = await Users.findOne({
+      _id: user_id
+    })
+    await sendWelcomeEmail({ email: user.email, name: user.name })
 
     return res.status(200).send({ ok: true, updated_user });
   } catch (error) {

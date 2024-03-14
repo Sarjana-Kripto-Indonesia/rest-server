@@ -3,7 +3,8 @@ const mongoose = require('mongoose')
 const midtransClient = require('midtrans-client');
 const app = express.Router()
 const Courses = require('../../models/courses')
-const coursesTransactions = require('../../models/courses-transactions')
+const coursesTransactions = require('../../models/courses-transactions');
+const Users = require('../../models/users');
 const snap = new midtransClient.Snap({
   isProduction: false,
   serverKey: 'SB-Mid-server-xKyCOvyiM2QR4r-alOgLGrjK',
@@ -117,6 +118,15 @@ app.post('/buy-course', async (req, res) => {
     let discountPrice = getCourse.price.disc ? parseFloat(getCourse.price.disc) : 0;
     let coursePrice = getCourse.price.value - discountPrice
 
+    // Get customer detail
+    const user_id = mongoose.Types.ObjectId(res.locals.user._id)
+    const user = await Users.findOne({ _id: user_id })
+    const customer_details = {
+      "first_name": user.name,
+      "last_name": "",
+      "email": user.email
+    }
+
     // Payment Gateway
     const order_id = `CRS-${res.locals.user._id.toString().slice(-5)}${req.body.course_id.slice(-5)}${Date.now()}`
     const transactionDetails = {
@@ -129,7 +139,7 @@ app.post('/buy-course', async (req, res) => {
       "finish": callback_url || "https://dev-web-apps.vercel.app/"
     }
 
-    const transactionToken = await snap.createTransaction({ transaction_details: transactionDetails, callbacks });
+    const transactionToken = await snap.createTransaction({ transaction_details: transactionDetails, callbacks, customer_details });
     console.log('transactionToken', transactionToken);
 
     // Log the status of the transaction

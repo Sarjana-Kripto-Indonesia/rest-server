@@ -87,7 +87,28 @@ const sendForgotPasswordEmail = async ({ token, email, name }) => {
   }
 }
 
+/**
+ * Send welcome email
+ * @param {string} email
+ * @param {string} name
+ */
+const sendWelcomeEmail = async ({ email, name }) => {
+  const template_id = 5787819
+  const subject = "Welcome!"
+
+  try {
+    const data = {
+      name
+    }
+
+    await sendEmail({ data, template_id, subject, email, name })
+  } catch (error) {
+    console.error("SEND EMAIL ERROR", { error })
+  }
+}
+
 module.exports = {
+  sendWelcomeEmail,
   sendVerificationEmail,
   sendForgotPasswordEmail
 }
