@@ -1,6 +1,6 @@
 {
   "name": "rest-server",
-  "version": "0.0.12",
+  "version": "0.0.14",
   "description": "Rest api SKI",
   "main": "index.js",
   "scripts": {
@@ -35,6 +35,7 @@
     "moment": "^2.29.1",
     "mongoose": "^6.2.2",
     "node-cron": "^3.0.2",
+    "node-mailjet": "^6.0.5",
     "node-xlsx": "^0.21.0",
     "nodemon": "^2.0.15",
     "redis": "^4.1.0",
