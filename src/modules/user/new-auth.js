@@ -10,11 +10,12 @@ const moment = require('moment')
 const { sendEmail, sendTelegram } = require('../../services/queue')
 const { generateRandomPassword } = require('../../helpers/password')
 const { decodeSessionTokenMiddleware } = require('../../modules/auth/decoding');
-
 const UtilLogs = require("../../utils/logs");
 const { sendVerificationEmail, sendForgotPasswordEmail } = require('../../services/mailing');
 const generateToken = require('../../utils/generate-token');
 const UserToken = require('../../models/user-token');
+const { OAuth2Client } = require('google-auth-library');
+const bcrypt = require("bcrypt")
 
 const writeLoginRecord = (uid, userRecord, ip, geo, userAgent, banned) => {
   return new Promise(async (resolve, reject) => {
@@ -62,9 +63,8 @@ const hashString = (val) => {
 // Secret for JWT
 const secretKey = 'thisIsOurSecret';
 
-// Middleware to generate and add tokens to res.locals
-const generateTokensMiddleware = (req, res, next) => {
-  const { name, email, password } = req.body;
+const jwtSignin = (payload) => {
+  const { name, email } = payload;
 
   // Create session token with a short expiration time (e.g., 15 minutes)
   const sessionToken = jwt.sign({ name, email }, secretKey, { expiresIn: '7d' });
@@ -72,11 +72,33 @@ const generateTokensMiddleware = (req, res, next) => {
   // Create refresh token with a longer expiration time (e.g., 7 days)
   const refreshToken = jwt.sign({ name, email }, secretKey, { expiresIn: '7d' });
 
-  // Add tokens to res.locals for further use in the request lifecycle
+  return {
+    sessionToken,
+    refreshToken
+  }
+}
+
+// Middleware to generate and add tokens to res.locals
+const generateTokensMiddleware = (req, res, next) => {
+  const { sessionToken, refreshToken } = jwtSignin(req.body)
   res.locals.sessionToken = sessionToken;
   res.locals.refreshToken = refreshToken;
 
   next();
+
+  // const { name, email, password } = req.body;
+
+  // // Create session token with a short expiration time (e.g., 15 minutes)
+  // const sessionToken = jwt.sign({ name, email }, secretKey, { expiresIn: '7d' });
+
+  // // Create refresh token with a longer expiration time (e.g., 7 days)
+  // const refreshToken = jwt.sign({ name, email }, secretKey, { expiresIn: '7d' });
+
+  // // Add tokens to res.locals for further use in the request lifecycle
+  // res.locals.sessionToken = sessionToken;
+  // res.locals.refreshToken = refreshToken;
+
+  // next();
 };
 
 app.post('/signup', [
@@ -145,6 +167,64 @@ app.post('/login', generateTokensMiddleware, async (req, res) => {
     return res.status(401).json({ message: 'Invalid password' });
   }
 });
+
+app.post('/google/login', async (req, res) => {
+  try {
+    const { id_token } = req.body
+    const client = new OAuth2Client({
+      clientId: process.env.GOOGLE_CLIENT_ID || "271189954999-8jn9sp7q8p7ado2eelf4uqigpirlqhkp.apps.googleusercontent.com",
+      clientSecret: process.env.GOOGLE_CLIENT_SECRET || "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"
+    });
+    const ticket = await client.verifyIdToken({
+      idToken: id_token,
+      audience: process.env.GOOGLE_CLIENT_ID || "271189954999-8jn9sp7q8p7ado2eelf4uqigpirlqhkp.apps.googleusercontent.com"
+    });
+
+    const payload = ticket.getPayload();
+    const user = await Users.findOne({
+      email: payload.email
+    })
+
+    if (user) {
+      const { refreshToken, sessionToken } = await jwtSignin(user)
+      res.locals.refreshToken = refreshToken
+      res.locals.sessionToken = sessionToken
+      return res.status(200).json({ message: 'Login successful', data: { sessionToken, refreshToken } });
+    } else {
+      const salt = await bcrypt.genSalt();
+      const password = await bcrypt.hash(salt, salt);
+
+      const created_user = await Users.create({
+        name: payload?.name,
+        email: payload?.email,
+        is_verified: false,
+        password: hashString(password)
+      })
+
+      if (created_user) {
+        const { refreshToken, sessionToken } = await jwtSignin(created_user)
+        res.locals.refreshToken = refreshToken
+        res.locals.sessionToken = sessionToken
+
+        // * Send verification email
+        const token = await generateToken(created_user._id, "user-verification")
+        sendVerificationEmail({
+          token,
+          email: payload?.email,
+          name: payload?.name
+        })
+
+        return res.status(200).json({ message: 'Login successful', data: { sessionToken, refreshToken } });
+
+      } else {
+        throw new Error('Failed to sync user data')
+      }
+    }
+  } catch (error) {
+    console.log({ error })
+    return res.status(401).json({ message: error.message });
+  }
+})
 
 // Forget password endpoint
 app.post('/forgot-password', async (req, res) => {
