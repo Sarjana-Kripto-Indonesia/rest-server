@@ -6,6 +6,9 @@ const courseModules = require('../../models/courses-modules')
 const coursesTransactions = require('../../models/courses-transactions')
 const coursesOwnerships = require('../../models/courses-ownerships')
 const Webhooks = require("../../models/webhooks");
+const ReferralHistories = require('../../models/referrals-histories');
+const referralPaymentHistories = require('../../models/referral-payment-histories');
+const Users = require('../../models/users');
 
 app.post('/payment', async (req, res) => {
   console.log('webhook payment: /webhook/payment');
@@ -46,6 +49,26 @@ app.post('/payment', async (req, res) => {
         is_reviewed: false,
         is_done: false
       })
+
+      // If referral exist share the benefit 
+      const findReferral = await  ReferralHistories.findOne({ to: getTransaction.user_id }).exec();
+      if (findReferral !== null) {
+
+        const calculateSharedPoint = 0.1 * getTransaction.payment.price
+
+        // Write referral payment histories
+        const writePaymentHistories = await referralPaymentHistories.create({
+          course_id: getTransaction.course_id,
+          user_id: getTransaction.user_id,
+          referral_record: findReferral._id,
+          course_transactions: getTransaction._id,
+          shared_point:calculateSharedPoint
+        })
+
+        // Add point for referral first user (incremental with existing point)
+        const addPoint = await Users.updateOne({ _id: findReferral.to }, { $inc: { point: calculateSharedPoint } });
+      }
+
 
       // If there's succeded transaction remove the other for the same course
       await coursesTransactions.deleteMany({
