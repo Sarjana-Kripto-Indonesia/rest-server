@@ -17,7 +17,8 @@ const generateToken = require('../../utils/generate-token');
 const UserToken = require('../../models/user-token');
 const generateRefferal = require('../../helpers/referral');
 const { OAuth2Client } = require('google-auth-library');
-const bcrypt = require("bcrypt")
+const bcrypt = require("bcrypt");
+const { default: mongoose } = require('mongoose');
 
 const writeLoginRecord = (uid, userRecord, ip, geo, userAgent, banned) => {
   return new Promise(async (resolve, reject) => {
@@ -115,8 +116,7 @@ app.post('/signup', [
   })
 ], async (req, res) => {
   try {
-    const { name, email, password, referral } = req.body
-
+    const { name, email, password, country, province, referral } = req.body
     const errors = validationResult(req)
     if (!errors.isEmpty()) {
       return res.status(400).json({ errors: errors.array() });
@@ -127,6 +127,8 @@ app.post('/signup', [
       email,
       is_verified: false,
       password: hashString(password),
+      country,
+      province
       refferal: null,
       point:0
     })
@@ -249,6 +251,26 @@ app.post('/google/login', async (req, res) => {
   }
 })
 
+// Refresh token
+app.post('/refresh-access-token', [decodeSessionTokenMiddleware, generateTokensMiddleware], async (req, res) => {
+  try {
+    const user_id = mongoose.Types.ObjectId(res.locals.user._id)
+    const user = await Users.findOne({ _id: user_id });
+
+    if (!user) {
+      return res.status(401).json({ message: "Couldn't find any user with that email" });
+    }
+
+    const { sessionToken, refreshToken } = res.locals;
+
+    return res.status(200).json({ message: 'Login successful', data: { sessionToken, refreshToken } });
+  } catch (err) {
+    console.log({ error })
+    return res.status(401).json({ message: error.message });
+  }
+
+});
+
 // Forget password endpoint
 app.post('/forgot-password', async (req, res) => {
   try {
@@ -318,14 +340,45 @@ app.post('/reset-password', async (req, res) => {
 });
 
 app.get('/profile', decodeSessionTokenMiddleware, async (req, res) => {
-  console.log(req.user);
-  console.log('locals', res.locals);
+  try {
+    // console.log(req.user);
+    // console.log('locals', res.locals);
 
-  let getCurrentUser = await Users.findOne({ email: req.user.email }).select('-password').exec();
+    let getCurrentUser = await Users.findOne({ email: req.user.email }).select('-password').exec();
 
 
-  return res.status(200).json({ ok: true, data: getCurrentUser });
+    return res.status(200).json({ ok: true, data: getCurrentUser });
+  } catch (error) {
+    console.error({ error })
+    return res.status(500).json({ message: 'Server error' });
+
+  }
+
 })
+
+
+app.put('/profile', decodeSessionTokenMiddleware, async (req, res) => {
+  try {
+    const { name, phone, country, province } = req.body
+    const user_id = mongoose.Types.ObjectId(res.locals.user._id)
+    const user = await Users.updateOne({
+      _id: user_id
+    }, {
+      $set: {
+        phone,
+        name,
+        country,
+        province
+      }
+    })
+
+    return res.status(200).send({ ok: true, data: user });
+  } catch (error) {
+    console.log('error', error)
+    res.status(400).send(error)
+  }
+})
+
 
 
 module.exports = app

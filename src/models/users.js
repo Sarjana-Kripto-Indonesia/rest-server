@@ -14,6 +14,10 @@ const Users = database.model('Users', new database.Schema({
     default: false
   },
   deletedAt: Date,
+  phone: String,
+  country: String,
+  province: String,
+  avatar: String
 }, {
   timestamps: {
     createdAt: 'created_at',
