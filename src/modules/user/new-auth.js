@@ -128,19 +128,19 @@ app.post('/signup', [
       is_verified: false,
       password: hashString(password),
       country,
-      province
+      province,
       refferal: null,
-      point:0
+      point: 0
     })
 
     // Generate Self Refferal
     const generatedReferral = generateRefferal(createUser._id);
-    const updateRefferal = await Users.updateOne({ _id: createUser._id }, { $set: { referral:generatedReferral } })
+    const updateRefferal = await Users.updateOne({ _id: createUser._id }, { $set: { referral: generatedReferral } })
 
     // If Referred exist
     if (referral) {
       const findReferred = await Users.findOne({ referral });
-      if (!findReferred) return res.status(400).json({ message: "Referral not found" })    
+      if (!findReferred) return res.status(400).json({ message: "Referral not found" })
 
       const createHistories = await ReferralHistories.create({
         from: createUser._id,
@@ -224,7 +224,7 @@ app.post('/google/login', async (req, res) => {
 
       // Generate Self Refferal
       const generatedReferral = generateRefferal(created_user._id);
-      const updateRefferal = await Users.updateOne({ _id: created_user._id }, { $set: { referral:generatedReferral } })
+      const updateRefferal = await Users.updateOne({ _id: created_user._id }, { $set: { referral: generatedReferral } })
 
       if (created_user) {
         const { refreshToken, sessionToken } = await jwtSignin(created_user)
