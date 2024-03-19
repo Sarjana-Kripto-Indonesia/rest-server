@@ -1,6 +1,6 @@
 {
   "name": "rest-server",
-  "version": "0.0.15",
+  "version": "0.0.16",
   "description": "Rest api SKI",
   "main": "index.js",
   "scripts": {
