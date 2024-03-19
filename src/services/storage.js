@@ -18,11 +18,11 @@ require("dotenv").config();
 
 // S3 bucket configuration
 const s3Config = {
-  endpoint: process.env.DO_SPACES_ENDPOINT || "https://ski-assets.s3.ap-southeast-1.amazonaws.com/",
-  region: process.env.DO_SPACES_REGION || "ap-southeast-1",
+  endpoint: process.env.DO_SPACES_ENDPOINT,
+  region: process.env.DO_SPACES_REGION,
   credentials: {
-    accessKeyId: process.env.DO_SPACES_ACCESS_KEY_ID || "AKIARKVLPZ7AX7LI5INW",
-    secretAccessKey: process.env.DO_SPACES_SECRET_ACCESS_KEY || "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",
+    accessKeyId: process.env.DO_SPACES_ACCESS_KEY_ID,
+    secretAccessKey: process.env.DO_SPACES_SECRET_ACCESS_KEY,
   },
 };
 
@@ -98,7 +98,7 @@ const generateKey = (req, file, cb) => {
 // storage settings
 const storage = multerS3({
   s3: s3,
-  bucket: process.env.DO_SPACES_BUCKET || "ski-assets",
+  bucket: process.env.DO_SPACES_BUCKET,
   contentType: multerS3.AUTO_CONTENT_TYPE,
   key: generateKey,
   acl: "private",
@@ -127,7 +127,7 @@ const deleteObject = async (keys) => {
     const objectList = keys.map((e) => ({ Key: e }));
 
     const deleteCommand = new DeleteObjectsCommand({
-      Bucket: process.env.DO_SPACES_BUCKET || "ski-assets",
+      Bucket: process.env.DO_SPACES_BUCKET,
       Delete: {
         Objects: objectList,
       },
@@ -141,7 +141,7 @@ const deleteObject = async (keys) => {
     }
   } else {
     const deleteCommand = new DeleteObjectsCommand({
-      Bucket: process.env.DO_SPACES_BUCKET || "ski-assets",
+      Bucket: process.env.DO_SPACES_BUCKET,
       Key: keys,
     });
 
@@ -199,7 +199,7 @@ const retrieveFile = async (key) => {
     const url = await getSignedUrl(
       s3,
       new GetObjectCommand({
-        Bucket: process.env.DO_SPACES_BUCKET || "ski-assets",
+        Bucket: process.env.DO_SPACES_BUCKET,
         Key: key,
       })
     );
