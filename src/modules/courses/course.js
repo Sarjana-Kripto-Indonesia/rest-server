@@ -23,12 +23,9 @@ app.get('/', async (req, res) => {
     const qSorting = req.query.sort ? JSON.parse(req.query.sort) : null;
     const page = req.query.page ? parseInt(req.query.page) : 1
     const limit = req.query.limit ? parseInt(req.query.limit) : 10
-    
+
     const start = ((page - 1) * (limit));
     const is_mine = req.query.is_mine ? 1 : 0
-
-
-
 
     // automatically convert from obj to find parameter with regex
     if (qSearch) {
@@ -51,27 +48,6 @@ app.get('/', async (req, res) => {
     }
 
     aggregate.push({ $match: query });
-
-    if (is_mine) {
-      aggregate.push(
-        {
-          $lookup: {
-            from: "courses-ownerships",
-            localField: "_id",
-            foreignField: "course_id",
-            as: "ownership"
-          }
-        }
-      )
-      aggregate.push({
-        $match: {
-          $expr: {
-            $gt: [{ $size: "$ownership" }, 0]
-          }
-        }
-      })
-    }
-
 
     // sorting
     if (qSorting && Object.keys(qSorting).length > 0) {
@@ -110,6 +86,24 @@ app.get('/', async (req, res) => {
       })
     }
 
+    // Get ratings and attendees
+    aggregate.push({
+      $lookup: {
+        from: "courses-ownerships",
+        localField: "_id",
+        foreignField: "course_id",
+        as: "attendees"
+      }
+    })
+
+    aggregate.push({
+      $lookup: {
+        from: "courses-reviews",
+        localField: "_id",
+        foreignField: "course_id",
+        as: "ratings"
+      }
+    })
 
     //grouping all match documents
     aggregate.push({
@@ -135,9 +129,20 @@ app.get('/', async (req, res) => {
     let execute = await Courses.aggregate(aggregate);
     console.log(execute);
 
+    const mapped_data = execute?.[0]?.data?.map((e) => {
+      const total_ratings = e?.ratings?.reduce((acc, curr) => {
+        return acc + curr?.rating
+      }, 0) || 0
+      return {
+        ...e,
+        attendees_count: e?.attendees?.length || 0,
+        rating: (total_ratings / e?.ratings?.length) || 0,
+      }
+    })
+
     res.status(200).json({
       success: true,
-      data: execute.length > 0 ? execute[0].data : [],
+      data: execute.length > 0 ? mapped_data : [],
       count: execute.length > 0 ? execute[0].count : 0,
     })
   } catch (error) {

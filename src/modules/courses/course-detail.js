@@ -76,12 +76,22 @@ app.get('/:course_id', async (req, res) => {
       },
     })
 
+    // Get ratings and attendees
+    aggregate.push({
+      $lookup: {
+        from: "courses-ownerships",
+        localField: "_id",
+        foreignField: "course_id",
+        as: "attendees"
+      }
+    })
+
     // Get Completion
     if (user_id) {
       aggregate.push({
         $lookup: {
           from: "courses-ownerships",
-          let: { course_id:"$_id", user_id},
+          let: { course_id: "$_id", user_id },
           pipeline: [
             {
               $match: {
@@ -95,13 +105,16 @@ app.get('/:course_id', async (req, res) => {
             }
           ],
           as: "ownership"
-      }})
+        }
+      })
     }
+
 
 
     // access the DB
     let execute = await Courses.aggregate(aggregate);
     let selectedCourse = execute.length > 0 ? execute[0] : {}
+    selectedCourse.attendees_count = selectedCourse?.attendees?.length || 0
 
 
     if (user_id) {
@@ -133,7 +146,7 @@ app.get('/:course_id', async (req, res) => {
 
 
         //Check is_done = all module finished
-        
+
 
       } else {
         selectedCourse.is_bought = false;
