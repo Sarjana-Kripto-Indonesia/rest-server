@@ -51,7 +51,7 @@ app.post('/payment', async (req, res) => {
       })
 
       // If referral exist share the benefit 
-      const findReferral = await  ReferralHistories.findOne({ to: getTransaction.user_id }).exec();
+      const findReferral = await  ReferralHistories.findOne({ from: getTransaction.user_id }).exec();
       if (findReferral !== null) {
 
         const calculateSharedPoint = 0.1 * getTransaction.payment.price
