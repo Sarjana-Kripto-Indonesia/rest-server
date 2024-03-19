@@ -3,6 +3,7 @@ const crypto = require('crypto');
 const jwt = require('jsonwebtoken');
 const app = express.Router()
 const Users = require('../../models/users');
+const ReferralHistories = require('../../models/referrals-histories');
 const { body, validationResult } = require('express-validator')
 const { generateOtp, generateReferralCode } = require('../../helpers/string-generator')
 const axios = require('axios')
@@ -14,6 +15,7 @@ const UtilLogs = require("../../utils/logs");
 const { sendVerificationEmail, sendForgotPasswordEmail } = require('../../services/mailing');
 const generateToken = require('../../utils/generate-token');
 const UserToken = require('../../models/user-token');
+const generateRefferal = require('../../helpers/referral');
 const { OAuth2Client } = require('google-auth-library');
 const bcrypt = require("bcrypt")
 
@@ -113,7 +115,7 @@ app.post('/signup', [
   })
 ], async (req, res) => {
   try {
-    const { name, email, password } = req.body
+    const { name, email, password, referral } = req.body
 
     const errors = validationResult(req)
     if (!errors.isEmpty()) {
@@ -124,8 +126,25 @@ app.post('/signup', [
       name,
       email,
       is_verified: false,
-      password: hashString(password)
+      password: hashString(password),
+      refferal: null,
+      point:0
     })
+
+    // Generate Self Refferal
+    const generatedReferral = generateRefferal(createUser._id);
+    const updateRefferal = await Users.updateOne({ _id: createUser._id }, { $set: { referral:generatedReferral } })
+
+    // If Referred exist
+    if (referral) {
+      const findReferred = await Users.findOne({ referral });
+      if (!findReferred) return res.status(400).json({ message: "Referral not found" })    
+
+      const createHistories = await ReferralHistories.create({
+        from: createUser._id,
+        to: findReferred._id
+      });
+    }
 
     // * Send verification email
     const token = await generateToken(createUser._id, "user-verification")
@@ -200,6 +219,10 @@ app.post('/google/login', async (req, res) => {
         is_verified: false,
         password: hashString(password)
       })
+
+      // Generate Self Refferal
+      const generatedReferral = generateRefferal(created_user._id);
+      const updateRefferal = await Users.updateOne({ _id: created_user._id }, { $set: { referral:generatedReferral } })
 
       if (created_user) {
         const { refreshToken, sessionToken } = await jwtSignin(created_user)

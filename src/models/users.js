@@ -6,6 +6,9 @@ const Users = database.model('Users', new database.Schema({
   name: String,
   password: String,
   email: String,
+  referral: String,
+  referred: Object,
+  point: Number,
   is_verified: {
     type: Boolean,
     default: false
