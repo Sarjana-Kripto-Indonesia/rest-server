@@ -96,6 +96,9 @@ app.use('/user-auth', decodeSessionTokenMiddleware, require('./src/modules/user/
 app.use('/transaction', decodeSessionTokenMiddleware, require('./src/modules/transaction/transaction'))
 // End Of Transaction
 
+// Start of Referral
+app.use('/referral', decodeSessionTokenMiddleware, require('./src/modules/referral/referral'))
+// End of Referral
 // WebHook Test
 app.use('/webhook', require('./src/modules/webhook/midtrans'))
 

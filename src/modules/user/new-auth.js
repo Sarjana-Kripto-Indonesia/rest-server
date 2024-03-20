@@ -193,12 +193,12 @@ app.post('/google/login', async (req, res) => {
   try {
     const { id_token } = req.body
     const client = new OAuth2Client({
-      clientId: process.env.GOOGLE_CLIENT_ID || "271189954999-8jn9sp7q8p7ado2eelf4uqigpirlqhkp.apps.googleusercontent.com",
-      clientSecret: process.env.GOOGLE_CLIENT_SECRET || "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"
+      clientId: process.env.GOOGLE_CLIENT_ID,
+      clientSecret: process.env.GOOGLE_CLIENT_SECRET
     });
     const ticket = await client.verifyIdToken({
       idToken: id_token,
-      audience: process.env.GOOGLE_CLIENT_ID || "271189954999-8jn9sp7q8p7ado2eelf4uqigpirlqhkp.apps.googleusercontent.com"
+      audience: process.env.GOOGLE_CLIENT_ID
     });
 
     const payload = ticket.getPayload();
