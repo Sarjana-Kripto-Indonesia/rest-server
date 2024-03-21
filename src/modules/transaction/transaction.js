@@ -24,7 +24,7 @@ app.get('/user-transaction', async (req, res) => {
       const transaction = await getTransactionCourse(req, res);
       data = transaction.length > 0 ? transaction[0].data : [];
       count = transaction.length > 0 ? transaction[0].count : 0;
-      
+
     } else if (type == 'referral') {
       const histories = await getReferralHistories(req, res);
       data = histories.length > 0 ? histories[0].data : [];
@@ -36,7 +36,50 @@ app.get('/user-transaction', async (req, res) => {
       data,
       count
     })
-    
+
+  } catch (error) {
+    console.log(error);
+    res.status(400).json({
+      error: true,
+      message: error
+    })
+  }
+});
+
+app.get('/invoice/:transaction_id', async (req, res) => {
+  console.log('get invoice: /invoice/:transaction_id');
+  try {
+    let aggregate = [];
+    let query = {};
+    let sorting = {};
+    // main query
+
+    // define params
+    const transaction_id = req?.params?.transaction_id ? mongoose.Types.ObjectId(req?.params?.transaction_id) : null
+    const user_id = res?.locals?.user?._id ? mongoose.Types.ObjectId(res.locals.user._id) : null
+
+    // if no transaction_id
+    if (!transaction_id) {
+      return res.status(400).json({
+        error: true,
+        message: "Transaction ID not found"
+      })
+    }
+
+    // special cases
+    query['_id'] =
+      transaction_id
+    query['user_id'] = user_id
+    aggregate.push({ $match: query });
+
+    // access the DB
+    let execute = await coursesTransactions.aggregate(aggregate);
+    console.log(execute);
+
+    res.status(200).json({
+      success: true,
+      data: execute[0]
+    })
   } catch (error) {
     console.log(error);
     res.status(400).json({
