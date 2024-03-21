@@ -24,7 +24,7 @@ app.get('/user-transaction', async (req, res) => {
       const transaction = await getTransactionCourse(req, res);
       data = transaction.length > 0 ? transaction[0].data : [];
       count = transaction.length > 0 ? transaction[0].count : 0;
-      
+
     } else if (type == 'referral') {
       const histories = await getReferralHistories(req, res);
       data = histories.length > 0 ? histories[0].data : [];
@@ -36,7 +36,7 @@ app.get('/user-transaction', async (req, res) => {
       data,
       count
     })
-    
+
   } catch (error) {
     console.log(error);
     res.status(400).json({
@@ -69,7 +69,7 @@ app.get('/invoice/:transaction_id', async (req, res) => {
     // special cases
     query['_id'] =
       transaction_id
-    qurey['user_id'] = user_id
+    query['user_id'] = user_id
     aggregate.push({ $match: query });
 
     // access the DB
