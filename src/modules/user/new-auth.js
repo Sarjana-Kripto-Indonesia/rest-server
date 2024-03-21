@@ -142,6 +142,7 @@ app.post('/signup', [
       const findReferred = await Users.findOne({ referral });
       if (!findReferred) return res.status(400).json({ message: "Referral not found" })
 
+      const setRefferalStatus = await Users.updateOne({ _id: createUser._id }, { $set: { referral_set: true } })
       const createHistories = await ReferralHistories.create({
         from: createUser._id,
         to: findReferred._id
@@ -218,7 +219,7 @@ app.post('/google/login', async (req, res) => {
       const created_user = await Users.create({
         name: payload?.name,
         email: payload?.email,
-        is_verified: false,
+        is_verified: true,
         password: hashString(password)
       })
 

@@ -134,5 +134,44 @@ app.get('/history', async (req, res) => {
   }
 });
 
+app.post('/disable-referral', async (req, res) => {
+  console.log('disable-referral')
+  try {
+    // Client detail
+    const user_id = mongoose.Types.ObjectId(res.locals.user._id);
+
+    const disabledReferral = await Users.updateOne({ _id: user_id }, { $set: { referral_set: true } });
+
+    return res.status(200).json({ message: "Successfully disable referral pop-up" })
+  } catch (error) {
+    console.log({ error })
+    return res.status(401).json({ message: error.message });
+  }
+})
+
+app.post('/set-referral', async (req, res) => {
+  console.log('set-referral')
+  try {
+    const { referral } = req.body;
+    // Client detail
+    const user_id = mongoose.Types.ObjectId(res.locals.user._id)
+
+    // Find referral exist
+    const findReferred = await Users.findOne({ referral });
+    if (!findReferred) return res.status(400).json({ message: "Referral not found" })
+
+    const setRefferalStatus = await Users.updateOne({ _id: createUser._id }, { $set: { referral_set: true } })
+    const createHistories = await ReferralHistories.create({
+      from: user_id,
+      to: findReferred._id
+    });
+    
+    return res.status(200).json({ message: "Successfully added referral" })
+  } catch (error) {
+    console.log({ error })
+    return res.status(401).json({ message: error.message });
+  }
+})
+
 
 module.exports = app
