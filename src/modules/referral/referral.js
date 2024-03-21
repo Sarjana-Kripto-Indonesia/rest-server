@@ -138,9 +138,11 @@ app.post('/disable-referral', async (req, res) => {
   console.log('disable-referral')
   try {
     // Client detail
-    const user_id = mongoose.Types.ObjectId(res.locals.user._id)
-    const disabledReferral = Users.updateOne({ _id: user_id }, { $set: { referral_set: true } });
-    console.log('disabledReferral');
+    const user_id = mongoose.Types.ObjectId(res.locals.user._id);
+    console.log(`user_id: ${user_id}`);
+
+    const disabledReferral = await Users.updateOne({ _id: user_id }, { $set: { referral_set: true } });
+    console.log('disabledReferral', disabledReferral);
 
     return res.status(200).json({ message: "Successfully disable referral pop-up" })
   } catch (error) {
@@ -155,6 +157,7 @@ app.post('/set-referral', async (req, res) => {
     const { referral } = req.body;
     // Client detail
     const user_id = mongoose.Types.ObjectId(res.locals.user._id)
+    console.log(`user_id: ${user_id}`);
 
     // Find referral exist
     const findReferred = await Users.findOne({ referral });
