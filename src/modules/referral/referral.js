@@ -160,7 +160,7 @@ app.post('/set-referral', async (req, res) => {
     const findReferred = await Users.findOne({ referral });
     if (!findReferred) return res.status(400).json({ message: "Referral not found" })
 
-    const setRefferalStatus = await Users.updateOne({ _id: createUser._id }, { $set: { referral_set: true } })
+    const setRefferalStatus = await Users.updateOne({ _id: user_id }, { $set: { referral_set: true } })
     const createHistories = await ReferralHistories.create({
       from: user_id,
       to: findReferred._id
