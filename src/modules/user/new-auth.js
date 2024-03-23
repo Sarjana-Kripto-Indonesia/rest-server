@@ -233,11 +233,11 @@ app.post('/google/login', async (req, res) => {
 
         // * Send verification email
         const token = await generateToken(created_user._id, "user-verification")
-        sendVerificationEmail({
-          token,
-          email: payload?.email,
-          name: payload?.name
-        })
+        // sendVerificationEmail({
+        //   token,
+        //   email: payload?.email,
+        //   name: payload?.name
+        // })
 
         return res.status(200).json({ message: 'Login successful', data: { sessionToken, refreshToken } });
 
