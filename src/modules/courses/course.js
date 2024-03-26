@@ -83,7 +83,14 @@ app.get('/', async (req, res) => {
         $addFields: {
           is_bought: { $gt: [{ $size: "$ownership" }, 0] }
         }
+      });
+
+      aggregate.push({
+        $match: {
+          is_bought:true
+        }
       })
+
     }
 
     // Get ratings and attendees

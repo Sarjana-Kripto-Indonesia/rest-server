@@ -5,8 +5,9 @@ const courseModules = database.model("courses-modules", new database.Schema({
     syllabus_id: {type:mongoose.Types.ObjectId, ref: 'courses-syllabuses'},
     name: String,
     desc: Object,
-    videos: Array,
+    video: Array,
     quiz: Array,
+    document: Array,
     deletedAt:Date
 }, {
     timestamps: {
