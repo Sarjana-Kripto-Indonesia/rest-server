@@ -9,6 +9,10 @@ const Users = database.model('Users', new database.Schema({
   referral: String,
   referred: Object,
   point: Number,
+  referral_set: {
+    type: Boolean,
+    default: false
+  },
   is_verified: {
     type: Boolean,
     default: false
