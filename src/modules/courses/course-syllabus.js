@@ -97,8 +97,10 @@ app.get('/', async (req, res) => {
           module.quiz_done = module.user_answer.length > 0 ? true : false
           if (module.quiz_done) {
             module.quiz.forEach((quiz, idx) => {
-              let currentAnswerIdx = module.user_answer[0].answers[idx].order - 1
-              quiz.answers[currentAnswerIdx].chosen = true
+              let currentAnswerIdx = module.user_answer[0].answers[idx]?.order - 1
+              if (quiz?.answers?.[currentAnswerIdx]) {
+                quiz.answers[currentAnswerIdx].chosen = true
+              }
             })
           } else {
             // Not answered yet don't show is_correct
